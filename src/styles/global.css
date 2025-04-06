@@ -1,22 +1,23 @@
 @import "tailwindcss";
-@layer base {
-  body {
-    @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200;
-  }
-  h1 {
-    @apply text-3xl font-bold;
-  }
-  h2 {
-    @apply text-2xl font-bold;
-  }
-  h3 {
-    @apply text-xl font-bold;
-  }
-  p {
-    @apply mb-4 leading-relaxed;
-  }
-  a {
-    @apply text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300;
-  }
+
+/* 基本的なカラー変数（ライトモード） */
+:root {
+  --color-primary-bg: white;
+  --color-primary-text: black;
 }
 
+/* ダークモード変数の上書き */
+.dark {
+  --color-primary-bg: #121212;
+  --color-primary-text: white;
+}
+
+/* カスタムユーティリティの定義 */
+@layer utilities {
+  .bg-primary {
+    background-color: var(--color-primary-bg);
+  }
+  .text-primary {
+    color: var(--color-primary-text);
+  }
+}
