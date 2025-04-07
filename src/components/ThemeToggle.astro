@@ -88,35 +88,37 @@
 <script>
   // テーマの保存と取得のためのユーティリティ
   const themeStorage = {
-    getTheme: () => localStorage.getItem("theme"),
-    setTheme: (theme) => localStorage.setItem("theme", theme),
+    getTheme: (): string | null => localStorage.getItem("theme"),
+    setTheme: (theme: string): void => localStorage.setItem("theme", theme),
   };
 
   // システムのカラースキーム設定を監視
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const mediaQuery: MediaQueryList = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  );
 
   // ページロード時に実行する初期設定
-  document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("theme-toggle");
+  document.addEventListener("DOMContentLoaded", (): void => {
+    const toggle: HTMLElement | null = document.getElementById("theme-toggle");
 
     // ローカルストレージからテーマを取得、なければシステム設定を使用
-    const savedTheme = themeStorage.getTheme();
+    const savedTheme: string | null = themeStorage.getTheme();
     if (savedTheme) {
       document.documentElement.classList.toggle("dark", savedTheme === "dark");
     } else {
-      const systemIsDark = mediaQuery.matches;
+      const systemIsDark: boolean = mediaQuery.matches;
       document.documentElement.classList.toggle("dark", systemIsDark);
       themeStorage.setTheme(systemIsDark ? "dark" : "light");
     }
 
     // テーマ切り替えの処理
-    toggle.addEventListener("click", () => {
-      const isDark = document.documentElement.classList.toggle("dark");
+    toggle?.addEventListener("click", (): void => {
+      const isDark: boolean = document.documentElement.classList.toggle("dark");
       themeStorage.setTheme(isDark ? "dark" : "light");
     });
 
     // システム設定の変更を監視
-    mediaQuery.addEventListener("change", (e) => {
+    mediaQuery.addEventListener("change", (e: MediaQueryListEvent): void => {
       // ユーザーが手動で設定していない場合のみシステム設定に従う
       if (!themeStorage.getTheme()) {
         document.documentElement.classList.toggle("dark", e.matches);
