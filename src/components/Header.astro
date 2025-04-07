@@ -1,17 +1,23 @@
-<header class="flex justify-between items-center p-4 shadow-md">
-  <a href="/" class="text-2xl font-bold text-blue-600">RyoBlog</a>
-  <nav class="hidden md:block">
-    <ul class="flex space-x-6">
-      <li>
-        <a href="">記事一覧</a>
-      </li>
-      <li>
-        <a href="">運営者について</a>
-      </li>
-      <li>
-        <a href=""> お問い合わせ </a>
-      </li>
-    </ul>
-  </nav>
-  <div>ダークモード</div>
+---
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header class="flex justify-between items-center p-4">
+  <a href="/">RyoBlog</a>
+  <div class="flex items-center space-x-4">
+    <nav class="hidden md:block">
+      <ul class="flex space-x-6">
+        <li>
+          <a href="">記事一覧</a>
+        </li>
+        <li>
+          <a href="">運営者について</a>
+        </li>
+        <li>
+          <a href="">お問い合わせ</a>
+        </li>
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
 </header>

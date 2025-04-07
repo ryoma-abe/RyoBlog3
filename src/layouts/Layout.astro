@@ -1,26 +1,35 @@
----
-import "../styles/global.css";
----
-
 <!doctype html>
-<html lang="ja" class="dark">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro Basics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RyoBlog</title>
+    <script is:inline>
+      // ローカルストレージから設定を即時取得
+      const theme = (() => {
+        if (
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem("theme")
+        ) {
+          return localStorage.getItem("theme");
+        }
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          return "dark";
+        }
+        return "light";
+      })();
+
+      // HTML要素にダークモードクラスをすぐに適用（ページレンダリング前）
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
   </head>
   <body class="bg-primary text-primary">
-    <slot />
+    <main>
+      <slot />
+    </main>
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-  }
-</style>
