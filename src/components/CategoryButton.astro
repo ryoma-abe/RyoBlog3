@@ -1,25 +1,40 @@
 ---
-// カテゴリーデータを取得する（実際のデータ取得方法に合わせて調整してください）
-const categories = [
-  { id: "all", name: "すべて" },
-  { id: "frontend", name: "フロントエンド" },
-  { id: "shopify", name: "Shopify" },
-  { id: "javascript", name: "JavaScript" },
-  { id: "css", name: "CSS" },
+const allPosts = await Astro.glob("../content/blog/*.md");
+
+const currentPath = Astro.url.pathname;
+
+// カテゴリ一覧を取得（重複排除 & nullチェック）
+const uniqueTags = [
+  ...new Set(
+    allPosts
+      .flatMap((post) => post.frontmatter.tags || [])
+      .filter((tag): tag is string => typeof tag === "string")
+  ),
 ];
 ---
 
-<div class="w-fit mx-auto">
-  <h1 class="text-center text-4xl">フロントエンドとShopifyの備忘録</h1>
-  <ul class="flex flex-wrap gap-2 w-fit mx-auto mt-5">
+<div class="w-fit mx-auto text-center">
+  <h1 class="text-4xl font-bold">RyoBlog</h1>
+
+  <ul class="flex flex-wrap justify-center gap-2 mt-5">
     {
-      categories.map((category) => (
-        <li>
-          <button class="p-2 cursor-pointer hover:border-b">
-            {category.name}
-          </button>
-        </li>
-      ))
+      uniqueTags.map((tag) => {
+        const tagUrl = `/tags/${encodeURIComponent(tag)}`;
+        const isActive = currentPath === tagUrl;
+
+        return (
+          <li>
+            <a
+              href={tagUrl}
+              class={`p-2 hover:underline ${
+                isActive ? "font-bold text-blue-600" : ""
+              }`}
+            >
+              {tag}
+            </a>
+          </li>
+        );
+      })
     }
   </ul>
 </div>
