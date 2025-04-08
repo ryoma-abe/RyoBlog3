@@ -1,16 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-export function getStaticPaths(){
-
-  return [
-    {params:{tag:'astro'}},
-    {params:{tag:'Javascript'}}
-  ];
-
+export function getStaticPaths() {
+  return [{ params: { tag: "astro" } }, { params: { tag: "javascript" } }];
 }
-
+const { tag } = Astro.params;
 ---
 
 <Layout>
-  <h1>tag:Astroのページ</h1>
+  <h1>tag:{tag}のページ</h1>
 </Layout>
