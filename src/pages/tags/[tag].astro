@@ -4,6 +4,7 @@ export function getStaticPaths() {
   return [{ params: { tag: "astro" } }, { params: { tag: "javascript" } }];
 }
 const { tag } = Astro.params;
+const allPosts = await Astro.glob("../../content/blog/*.md");
 ---
 
 <Layout>
