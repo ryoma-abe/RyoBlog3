@@ -1,8 +1,8 @@
 ---
-title: 1つ目の記事です
+title: 2つ目の記事です
 tags:
-  - astro
-description: Astroについての最初の記事です
+  - html
+description: htmlについての最初の記事です
 date: "2025-04-09"
 draft: false
 ---
