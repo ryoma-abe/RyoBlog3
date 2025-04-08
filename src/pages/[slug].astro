@@ -1,0 +1,48 @@
+---
+// src/pages/[slug].astro
+import Layout from "../layouts/Layout.astro";
+import fs from "fs";
+import path from "path";
+import { compileMDX } from "astro/mdx";
+// または他のMarkdownパーサー
+
+export async function getStaticPaths() {
+  // src/blog ディレクトリからmdファイルを読み込む
+  const blogDir = path.join(process.cwd(), "src", "blog");
+  const files = fs.readdirSync(blogDir).filter((file) => file.endsWith(".md"));
+
+  return files.map((file) => {
+    const slug = file.replace(".md", "");
+    // mdファイルの内容を読み込む
+    const content = fs.readFileSync(path.join(blogDir, file), "utf-8");
+
+    // frontmatterを解析（簡易実装例）
+    const frontmatter = {};
+    const frontmatterMatch = content.match(/---\s*([\s\S]*?)\s*---/);
+    if (frontmatterMatch) {
+      const frontmatterText = frontmatterMatch[1];
+      frontmatterText.split("\n").forEach((line) => {
+        const [key, ...valueParts] = line.split(":");
+        if (key && valueParts.length) {
+          frontmatter[key.trim()] = valueParts.join(":").trim();
+        }
+      });
+    }
+
+    return {
+      params: { slug },
+      props: { content, frontmatter },
+    };
+  });
+}
+
+const { content, frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title || "Blog Post"}>
+  <article>
+    <h1>{frontmatter.title}</h1>
+    <!-- Markdownコンテンツをレンダリング -->
+    <div set:html={/* ここでMarkdownをHTMLに変換 */} />
+  </article>
+</Layout>
