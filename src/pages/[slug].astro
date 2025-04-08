@@ -1,48 +1,54 @@
 ---
 // src/pages/[slug].astro
+import Header from "../components/Header.astro";
 import Layout from "../layouts/Layout.astro";
-import fs from "fs";
-import path from "path";
-import { compileMDX } from "astro/mdx";
-// または他のMarkdownパーサー
+import { getCollection, type CollectionEntry } from "astro:content";
 
-export async function getStaticPaths() {
-  // src/blog ディレクトリからmdファイルを読み込む
-  const blogDir = path.join(process.cwd(), "src", "blog");
-  const files = fs.readdirSync(blogDir).filter((file) => file.endsWith(".md"));
+// ブログ記事の型
+type BlogPost = CollectionEntry<"blog">;
 
-  return files.map((file) => {
-    const slug = file.replace(".md", "");
-    // mdファイルの内容を読み込む
-    const content = fs.readFileSync(path.join(blogDir, file), "utf-8");
-
-    // frontmatterを解析（簡易実装例）
-    const frontmatter = {};
-    const frontmatterMatch = content.match(/---\s*([\s\S]*?)\s*---/);
-    if (frontmatterMatch) {
-      const frontmatterText = frontmatterMatch[1];
-      frontmatterText.split("\n").forEach((line) => {
-        const [key, ...valueParts] = line.split(":");
-        if (key && valueParts.length) {
-          frontmatter[key.trim()] = valueParts.join(":").trim();
-        }
-      });
-    }
-
-    return {
-      params: { slug },
-      props: { content, frontmatter },
-    };
-  });
+// ページコンポーネントのProps型
+interface Props {
+  post: BlogPost;
 }
 
-const { content, frontmatter } = Astro.props;
+export async function getStaticPaths() {
+  // コンテンツコレクションからブログ記事を取得
+  const blogPosts = await getCollection("blog", ({ data }) => {
+    // 下書き記事を本番環境では除外（任意）
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+
+  return blogPosts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+// コンポーネントのprops
+const { post } = Astro.props;
+const { Content } = await post.render();
 ---
 
-<Layout title={frontmatter.title || "Blog Post"}>
+<Layout title={post.data.title}>
+  <Header />
   <article>
-    <h1>{frontmatter.title}</h1>
-    <!-- Markdownコンテンツをレンダリング -->
-    <div set:html={/* ここでMarkdownをHTMLに変換 */} />
+    {post.data.description && <p>{post.data.description}</p>}
+
+    <div class="content">
+      <Content />
+    </div>
+
+    {
+      post.data.tags && post.data.tags.length > 0 && (
+        <footer>
+          <div>
+            {post.data.tags.map((tag) => (
+              <span>{tag}</span>
+            ))}
+          </div>
+        </footer>
+      )
+    }
   </article>
 </Layout>
