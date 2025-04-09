@@ -1,5 +1,4 @@
 name: Deploy to ConoHa WING
-
 on:
   push:
     branches:
