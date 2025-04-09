@@ -23,8 +23,6 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > key
           chmod 600 key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy via rsync
         uses: burnett01/rsync-deployments@5.1
