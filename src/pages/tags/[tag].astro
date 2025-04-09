@@ -1,37 +1,19 @@
 ---
+// src/pages/tags/[tag].astro
+
 import Layout from "../../layouts/Layout.astro";
+import { getAllPosts } from "../../lib/blog";
 
-type Post = {
-  frontmatter: {
-    title: string;
-    tags: string[];
-    [key: string]: any;
-  };
-  file: string;
-  [key: string]: any;
-};
-
-type PostWithSlug = Post & { slug: string };
-
-type StaticPath = {
-  params: { tag: string };
-  props: { posts: PostWithSlug[] };
-};
-
-export async function getStaticPaths(): Promise<StaticPath[]> {
-  const allPosts = (await Astro.glob("../../content/blog/*.md")) as Post[];
-
-  const uniqueTags = [
-    ...new Set(allPosts.map((post) => post.frontmatter.tags).flat()),
+export async function getStaticPaths() {
+  const allPosts = await getAllPosts();
+  const allTags = [
+    ...new Set(allPosts.flatMap((post) => post.data.tags || [])),
   ];
 
-  return uniqueTags.map((tag): StaticPath => {
-    const filteredPosts = allPosts
-      .filter((post) => post.frontmatter.tags.includes(tag))
-      .map((post) => ({
-        ...post,
-        slug: post.file?.split("/").pop()?.replace(".md", "") || "no-slug",
-      }));
+  return allTags.map((tag) => {
+    const filteredPosts = allPosts.filter((post) =>
+      post.data.tags?.includes(tag)
+    );
 
     return {
       params: { tag },
@@ -48,9 +30,9 @@ const { tag } = Astro.params;
   <h1>tag: {tag} のページ</h1>
   <ul>
     {
-      posts.map((post: PostWithSlug) => (
+      posts.map((post) => (
         <li>
-          <a href={`/${post.slug}`}>{post.frontmatter.title}</a>
+          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
         </li>
       ))
     }

@@ -1,31 +1,22 @@
 ---
-// src/pages/[slug].astro
-import Header from "../components/Header.astro";
 import Layout from "../layouts/Layout.astro";
-import { getCollection, type CollectionEntry } from "astro:content";
+import { type CollectionEntry } from "astro:content";
+import { getAllPosts } from "../lib/blog";
 
-// ブログ記事の型
 type BlogPost = CollectionEntry<"blog">;
 
-// ページコンポーネントのProps型
 interface Props {
   post: BlogPost;
 }
 
 export async function getStaticPaths() {
-  // コンテンツコレクションからブログ記事を取得
-  const blogPosts = await getCollection("blog", ({ data }) => {
-    // 下書き記事を本番環境では除外（任意）
-    return import.meta.env.PROD ? !data.draft : true;
-  });
-
+  const blogPosts = await getAllPosts();
   return blogPosts.map((post) => ({
     params: { slug: post.slug },
     props: { post },
   }));
 }
 
-// コンポーネントのprops
 const { post } = Astro.props;
 const { Content } = await post.render();
 ---
@@ -37,17 +28,5 @@ const { Content } = await post.render();
     <div class="content">
       <Content />
     </div>
-
-    {
-      post.data.tags && post.data.tags.length > 0 && (
-        <footer>
-          <div>
-            {post.data.tags.map((tag) => (
-              <span>{tag}</span>
-            ))}
-          </div>
-        </footer>
-      )
-    }
   </article>
 </Layout>
