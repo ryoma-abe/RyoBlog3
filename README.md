@@ -1,49 +1,52 @@
-# Astro Starter Kit: Basic
 
-```sh
-npm create astro@latest -- --template basics
+---
+
+## ✅ `getAllPosts()` には何が入ってるの？
+
+`getAllPosts()` は、`astro:content` の `getCollection("blog")` を使っているので、  
+指定したコレクション（この場合は `"blog"`）の **すべての記事データ**が入っています。
+
+つまり…
+
+```ts
+const posts = await getAllPosts();
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+この `posts` には、各記事について **以下のような構造**のオブジェクトが配列で入ってます 👇
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+```ts
+{
+  id: "my-first-post.md",
+  slug: "my-first-post",
+  body: "...記事の中身...",
+  collection: "blog",
+  data: {
+    title: "こんにちは世界",
+    date: "2024-04-10",
+    tags: ["フロントエンド", "AI"],
+    draft: false,
+    description: "この記事は…",
+    // その他、frontmatterに書いた情報
+  },
+  render: [Function], // HTMLに変換するための関数
+}
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+---
 
-## 🧞 Commands
+## 📦 つまり「記事全体」って？
 
-All commands are run from the root of the project, from a terminal:
+- `slug`：URL に使える記事の識別子
+- `data`: frontmatter（タイトル、日付、タグ、下書きフラグなど）
+- `render()`：HTML コンテンツを表示するための関数（`.astro`で使うやつ）
+- `body`：Markdown の生テキスト（使いたければ）
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+---
 
-## 👀 Want to learn more?
+## 🔁 まとめると：
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-# RyoBlog3
+- `getAllPosts()` は `"blog"` コレクションにある**すべての投稿のメタ情報＋中身**を返す。
+- `getSortedPosts()` で日付順に並び替えたバージョンが欲しいときも便利。
+- `getAllPosts(true)` とすると「下書きも含めた全記事」が取得できる。
+
+---
