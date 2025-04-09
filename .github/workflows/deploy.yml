@@ -19,19 +19,14 @@ jobs:
       - name: Build Astro site
         run: npm run build
 
-      - name: Write SSH key
+      - name: Setup SSH Key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
-          sed -i 's/\r$//' key
-          chmod 600 key
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy via rsync
-        uses: burnett01/rsync-deployments@5.1
-        with:
-          switches: -avzr --delete
-          path: ./dist/
-          remote_path: ${{ secrets.REMOTE_PATH }}
-          remote_host: ${{ secrets.REMOTE_HOST }}
-          remote_user: ${{ secrets.REMOTE_USER }}
-          remote_port: ${{ secrets.REMOTE_PORT }}
-          remote_key: key
+        run: |
+          rsync -avzr --delete -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.REMOTE_PORT }} -i ~/.ssh/id_rsa" ./dist/ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
