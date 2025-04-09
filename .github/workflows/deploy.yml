@@ -21,7 +21,7 @@ jobs:
 
       - name: Write SSH key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > key
           chmod 600 key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
