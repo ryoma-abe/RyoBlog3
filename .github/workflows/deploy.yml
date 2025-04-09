@@ -3,7 +3,7 @@ name: Deploy to ConoHa WING
 on:
   push:
     branches:
-      - main # ← デプロイのトリガーになるブランチ名
+      - main
 
 jobs:
   deploy:
