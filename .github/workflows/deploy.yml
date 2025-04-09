@@ -21,7 +21,8 @@ jobs:
 
       - name: Write SSH key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
+          sed -i 's/\r$//' key
           chmod 600 key
 
       - name: Deploy via rsync
