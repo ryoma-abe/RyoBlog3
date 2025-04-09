@@ -1,0 +1,38 @@
+name: Deploy to ConoHa WING
+
+on:
+  push:
+    branches:
+      - main # ← デプロイのトリガーになるブランチ名
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Astro site
+        run: npm run build
+
+      - name: Write SSH key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > key
+          chmod 600 key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy via rsync
+        uses: burnett01/rsync-deployments@v5.1
+        with:
+          switches: -avzr --delete
+          path: ./dist/
+          remote_path: ${{ secrets.REMOTE_PATH }}
+          remote_host: ${{ secrets.REMOTE_HOST }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_port: ${{ secrets.REMOTE_PORT }}
+          remote_key: key
