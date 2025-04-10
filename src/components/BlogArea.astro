@@ -1,46 +1,54 @@
 ---
-import { getSortedPosts, tagColors, formatDate } from "../lib/blog";
+import { getSortedPosts } from "../lib/blog";
+import { formatDate } from "../lib/utils";
+import { getTagColor } from "../lib/tags";
+
 const sortedPosts = await getSortedPosts();
 ---
 
 <!-- 記事グリッド -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
   {
     sortedPosts.map((post) => {
-      const mainTag =
-        post.data.tags && post.data.tags.length > 0
-          ? post.data.tags[0]
-          : "その他";
-      const bgColor = tagColors[mainTag] || tagColors["その他"];
-
       return (
-        <div class="bg-slate-800 rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
-          <div
-            class={`${bgColor} h-48 p-6 flex items-center justify-center text-white text-center`}
-          >
-            <h3 class="text-xl font-bold">{post.data.title}</h3>
-          </div>
-          <div class="p-4">
-            <div class="flex justify-between items-center mb-2">
-              <span
-                class={`text-sm px-3 py-1 rounded-full ${bgColor} text-white`}
-              >
-                {mainTag}
-              </span>
-              <span class="text-sm text-gray-400">
-                {formatDate(post.data.date)}
-              </span>
-            </div>
-            {post.data.description && (
-              <p class="text-gray-300 text-sm mb-4">{post.data.description}</p>
-            )}
-            <a
-              href={`/${post.slug}`}
-              class="block w-full text-center py-2 rounded-md bg-slate-700 hover:bg-slate-600 transition-colors text-white"
+        <div class="bg-slate-800 rounded-lg overflow-hidden shadow-lg">
+          <a href={`/${post.slug}`}>
+            <div
+              class={`h-48 p-6 flex items-center justify-center text-white text-center ${getTagColor(post.data.tags?.[0] || "その他")}`}
             >
-              記事を読む
-            </a>
-          </div>
+              <h3>{post.data.title}</h3>
+            </div>
+            <div class="p-4">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex gap-2 flex-wrap">
+                  {post.data.tags && post.data.tags.length > 0 ? (
+                    post.data.tags.map((tag) => {
+                      const tagColor = getTagColor(tag);
+                      return (
+                        <span
+                          class={`text-sm px-3 py-1 rounded-full ${tagColor} text-white`}
+                        >
+                          {tag}
+                        </span>
+                      );
+                    })
+                  ) : (
+                    <span class="text-sm px-3 py-1 rounded-full bg-gray-500 text-white">
+                      その他
+                    </span>
+                  )}
+                </div>
+                <span class="text-sm text-gray-400">
+                  {formatDate(post.data.date)}
+                </span>
+              </div>
+              {post.data.description && (
+                <p class="text-gray-300 text-sm mb-4">
+                  {post.data.description}
+                </p>
+              )}
+            </div>
+          </a>
         </div>
       );
     })
