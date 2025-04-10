@@ -1,6 +1,7 @@
 ---
 import CategoryButton from "../components/CategoryButton.astro";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 ---
 
@@ -33,8 +34,8 @@ import "../styles/global.css";
       }
     </script>
   </head>
+  <Header />
   <body class="bg-primary text-primary">
-    <Header />
     <main>
       <div class="container mx-auto py-10">
         <CategoryButton />
@@ -42,4 +43,5 @@ import "../styles/global.css";
       </div>
     </main>
   </body>
+  <Footer/>
 </html>
