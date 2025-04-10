@@ -1,7 +1,9 @@
 ---
 title: 1つ目の記事です
 tags:
-  - astro
+  - Astro
+  - HTML
+  - Javascript
 description: Astroについての最初の記事です
 date: "2025-04-09"
 draft: false
