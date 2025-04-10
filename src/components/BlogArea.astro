@@ -3,13 +3,18 @@ import { getSortedPosts } from "../lib/blog";
 import { formatDate } from "../lib/utils";
 import { getTagColor } from "../lib/tags";
 
+const POSTS_PER_PAGE = 12;
+const currentPage = Number(Astro.url.searchParams.get("page") || "1");
 const sortedPosts = await getSortedPosts();
+const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+const start = (currentPage - 1) * POSTS_PER_PAGE;
+const end = start + POSTS_PER_PAGE;
+const paginatedPosts = sortedPosts.slice(start, end);
 ---
-
 <!-- 記事グリッド -->
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-10">
   {
-    sortedPosts.slice(0,12).map((post) => {
+    paginatedPosts.map((post) => {
       return (
         <div class="bg-slate-800 rounded-lg overflow-hidden shadow-lg">
           <a href={`/${post.slug}`}>
@@ -54,3 +59,23 @@ const sortedPosts = await getSortedPosts();
     })
   }
 </div>
+
+<!-- ページネーション -->
+{totalPages > 1 && (
+  <div class="flex justify-center gap-2 mt-10">
+    {
+      Array.from({ length: totalPages }, (_, i) => {
+        const pageNum = i + 1;
+        const isCurrent = pageNum === currentPage;
+        return (
+          <a
+            href={`?page=${pageNum}`}
+            class={`px-4 py-2 rounded ${isCurrent ? "bg-white text-black font-bold" : "bg-gray-700 text-white hover:bg-gray-600"}`}
+          >
+            {pageNum}
+          </a>
+        );
+      })
+    }
+  </div>
+)}
