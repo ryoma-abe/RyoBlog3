@@ -11,6 +11,7 @@ const start = (currentPage - 1) * POSTS_PER_PAGE;
 const end = start + POSTS_PER_PAGE;
 const paginatedPosts = sortedPosts.slice(start, end);
 ---
+
 <!-- 記事グリッド -->
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-10">
   {
@@ -61,10 +62,10 @@ const paginatedPosts = sortedPosts.slice(start, end);
 </div>
 
 <!-- ページネーション -->
-{totalPages > 1 && (
-  <div class="flex justify-center gap-2 mt-10">
-    {
-      Array.from({ length: totalPages }, (_, i) => {
+{
+  totalPages > 1 && (
+    <div class="flex justify-center gap-2 mt-10">
+      {Array.from({ length: totalPages }, (_, i) => {
         const pageNum = i + 1;
         const isCurrent = pageNum === currentPage;
         return (
@@ -75,7 +76,7 @@ const paginatedPosts = sortedPosts.slice(start, end);
             {pageNum}
           </a>
         );
-      })
-    }
-  </div>
-)}
+      })}
+    </div>
+  )
+}
