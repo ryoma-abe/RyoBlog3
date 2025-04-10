@@ -1,0 +1,84 @@
+---
+import { getSortedPosts } from "../../../lib/blog";
+import { formatDate } from "../../../lib/utils";
+import { getTagColor } from "../../../lib/tags";
+
+const POSTS_PER_PAGE = 12;
+
+export async function getStaticPaths() {
+  const posts = await getSortedPosts();
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+
+  return Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: (i + 1).toString() },
+    props: {
+      page: i + 1,
+      totalPages,
+      posts: posts.slice(i * POSTS_PER_PAGE, (i + 1) * POSTS_PER_PAGE),
+    },
+  }));
+}
+
+const { posts, page, totalPages } = Astro.props;
+---
+
+<h1 class="text-2xl font-bold mb-4">記事一覧（{page}ページ目）</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-10">
+  {
+    posts.map((post) => (
+      <div class="bg-slate-800 rounded-lg overflow-hidden shadow-lg">
+        <a href={`/${post.slug}`}>
+          <div
+            class={`h-48 p-6 flex items-center justify-center text-white text-center ${getTagColor(post.data.tags?.[0] || "その他")}`}
+          >
+            <h3>{post.data.title}</h3>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex gap-2 flex-wrap">
+                {post.data.tags?.length > 0 ? (
+                  post.data.tags.map((tag) => (
+                    <span
+                      class={`text-sm px-3 py-1 rounded-full ${getTagColor(tag)} text-white`}
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span class="text-sm px-3 py-1 rounded-full bg-gray-500 text-white">
+                    その他
+                  </span>
+                )}
+              </div>
+              <span class="text-sm text-gray-400">
+                {formatDate(post.data.date)}
+              </span>
+            </div>
+            {post.data.description && (
+              <p class="text-gray-300 text-sm mb-4">{post.data.description}</p>
+            )}
+          </div>
+        </a>
+      </div>
+    ))
+  }
+</div>
+
+<!-- ページネーション -->
+<div class="flex justify-center mt-10 gap-2">
+  {
+    Array.from({ length: totalPages }, (_, i) => {
+      const pageNum = i + 1;
+      const isCurrent = pageNum === page;
+      return (
+        <a
+          href={`/blog/page/${pageNum}`}
+          class={`px-4 py-2 rounded ${isCurrent ? "bg-white text-black font-bold" : "bg-gray-700 text-white"}`}
+        >
+          {pageNum}
+        </a>
+      );
+    })
+  }
+</div>
