@@ -2,6 +2,7 @@
 import { getSortedPosts } from "../lib/blog";
 import { formatDate } from "../lib/utils";
 import { getTagColor } from "../lib/tags";
+import LinkButton from "./Atoms/LinkButton.astro";
 
 const POSTS_PER_PAGE = 12;
 const currentPage = Number(Astro.url.searchParams.get("page") || "1");
@@ -54,4 +55,7 @@ const paginatedPosts = sortedPosts.slice(start, end);
       );
     })
   }
+</div>
+<div class="mx-auto w-fit mt-20">
+  <LinkButton href="/blog/page">記事一覧を見る</LinkButton>
 </div>
