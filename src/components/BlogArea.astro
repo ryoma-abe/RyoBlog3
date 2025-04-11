@@ -13,11 +13,11 @@ const paginatedPosts = sortedPosts.slice(start, end);
 ---
 
 <!-- 記事グリッド -->
-<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-15">
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-15">
   {
     paginatedPosts.map((post) => {
       return (
-        <div class="bg-slate-800 rounded-lg overflow-hidden shadow-lg">
+        <div class="border">
           <a href={`/${post.slug}`}>
             <div
               class={`h-48 p-6 flex items-center justify-center text-white text-center ${getTagColor(post.data.tags?.[0] || "その他")}`}
@@ -44,14 +44,12 @@ const paginatedPosts = sortedPosts.slice(start, end);
                     </span>
                   )}
                 </div>
-                <span class="text-sm text-gray-400">
+                <span class="text-sm text-primary">
                   {formatDate(post.data.date)}
                 </span>
               </div>
               {post.data.description && (
-                <p class="text-gray-300 text-sm mb-4">
-                  {post.data.description}
-                </p>
+                <p>{post.data.description}</p>
               )}
             </div>
           </a>
