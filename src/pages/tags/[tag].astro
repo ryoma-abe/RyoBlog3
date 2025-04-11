@@ -28,7 +28,7 @@ const { tag } = Astro.params;
 
 <Layout title=`${tag}の記事一覧`>
   <div class="mt-10">
-    <ul>
+    <ul class="">
       {
         posts.map((post) => (
           <li>
