@@ -26,15 +26,16 @@ const { posts } = Astro.props;
 const { tag } = Astro.params;
 ---
 
-<Layout>
-  <h1>tag: {tag} のページ</h1>
-  <ul>
-    {
-      posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-        </li>
-      ))
-    }
-  </ul>
+<Layout title=`${tag}の記事一覧`>
+  <div class="mt-10">
+    <ul>
+      {
+        posts.map((post) => (
+          <li>
+            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </Layout>
