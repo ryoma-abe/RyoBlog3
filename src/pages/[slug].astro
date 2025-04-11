@@ -22,7 +22,7 @@ const { Content } = await post.render();
 ---
 
 <Layout title={post.data.title}>
-  <article>
+  <article class="blog-content max-w-screen-lg">
     {post.data.description && <p>{post.data.description}</p>}
 
     <div class="content">
@@ -31,58 +31,51 @@ const { Content } = await post.render();
   </article>
 </Layout>
 
-<style>
-  article {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
+<style is:global>
+  .blog-content {
+    margin: 100px auto 0;
   }
 
-  article h1 {
+  .blog-content h1 {
     margin-bottom: 1.5rem;
   }
 
-  article h2 {
+  .blog-content h2 {
     margin: 2rem 0 1rem;
   }
 
-  article h3 {
+  .blog-content h3 {
     margin: 1.5rem 0 1rem;
   }
 
-  article p {
+  .blog-content p {
     margin-bottom: 1.5rem;
   }
 
-  article pre {
+  .blog-content pre.astro-code.github-dark {
     padding: 1rem;
     margin: 1.5rem 0;
     overflow-x: auto;
   }
 
-  article blockquote {
-    padding-left: 1rem;
-    margin: 1.5rem 0;
-  }
-
-  article ul,
-  article ol {
+  .blog-content ul,
+  .blog-content ol {
     margin: 1.5rem 0;
     padding-left: 1.5rem;
   }
 
-  article li {
+  .blog-content li {
     margin-bottom: 0.5rem;
   }
 
-  article img {
+  .blog-content img {
     max-width: 100%;
     height: auto;
     margin: 1.5rem 0;
   }
 
   @media (max-width: 768px) {
-    article {
+    .blog-content {
       padding: 1rem;
     }
   }
