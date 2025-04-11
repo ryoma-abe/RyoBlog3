@@ -1,5 +1,6 @@
 ---
 title: 3つ目の記事です
+thumbnailTitle: こんにちは
 tags:
   - CSS
 description: htmlについての最初の記事です

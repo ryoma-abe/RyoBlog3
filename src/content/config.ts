@@ -13,6 +13,7 @@ const blogSchema = z.object({
   image: z.string().optional(),
   tags: z.array(z.string()).optional(),
   draft: z.boolean().optional().default(false),
+  thumbnailTitle: z.string().optional(),
 });
 
 // コレクションの定義

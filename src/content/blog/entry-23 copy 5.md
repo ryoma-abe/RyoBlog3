@@ -1,5 +1,6 @@
 ---
-title: 2つ目の記事です
+title: 3つ目の記事です
+thumbnailTitle: あ
 tags:
   - HTML
 description: htmlについての最初の記事です
