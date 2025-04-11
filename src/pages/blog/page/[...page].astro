@@ -1,0 +1,26 @@
+---
+// 1ページに表示する件数を設定
+export const postsPerPage = 8;
+
+// getStaticPaths()で動的なルートを設定
+export async function getStaticPaths({ paginate }) {
+  // 投稿を呼び出し
+  const allPosts = await getCollection("blog");
+
+  // 投稿を新しい順に並び替え
+  const sortedPosts = allPosts.sort((a, b) => {
+    const aDate = new Date(a.data.pubDate);
+    const bDate = new Date(b.data.pubDate);
+    return bDate.getTime() - aDate.getTime();
+  });
+
+  // 並び替えた投稿の配列から、1ページにX記事づつ入るようにページを生成
+  return paginate(sortedPosts, { pageSize: postsPerPage });
+}
+
+// paginate()関数を使用すると、各ページのデータはpageプロパティとして渡される
+const { page } = Astro.props;
+---
+
+{page.url.prev ? <a href={page.url.prev}>前へ</a> : null}
+{page.url.next ? <a href={page.url.next}>次へ</a> : null}
