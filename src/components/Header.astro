@@ -2,18 +2,19 @@
 import ThemeToggle from "./ThemeToggle.astro";
 
 const navItems = [
-  { href: "/blog/page", label: "記事一覧" },
-  { href: "/about", label: "運営者について" },
-  { href: "/contact", label: "お問い合わせ" },
+  { href: "/", label: "TOP" },
+  { href: "/blog/page", label: "BLOG" },
+  { href: "/about", label: "ABOUT" },
+  { href: "/contact", label: "CONTACT" },
 ];
 ---
 
 <header class="flex justify-between items-center p-4 border-b">
   <a href="/" class="text-2xl font-bold">RyoBlog</a>
 
-  <div class="flex items-center space-x-4">
+  <div class="flex items-center space-x-10">
     <nav class="hidden md:block">
-      <ul class="flex space-x-6">
+      <ul class="flex space-x-10">
         {
           navItems.map((item) => (
             <li>
