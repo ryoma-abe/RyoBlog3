@@ -3,12 +3,12 @@
 /* 基本的なカラー変数（ライトモード） */
 :root {
   --color-primary-bg: white;
-  --color-primary-text: black;
+  --color-primary-text: #333;
 }
 
 /* ダークモード変数の上書き */
 .dark {
-  --color-primary-bg: #121212;
+  --color-primary-bg: #333;
   --color-primary-text: white;
 }
 
