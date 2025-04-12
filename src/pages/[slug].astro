@@ -56,3 +56,39 @@ content = finalizeRenderedContent(content);
     <div class="prose prose-lg max-w-none mt-8" set:html={content} />
   </article>
 </Layout>
+
+<script>
+  // @ts-ignore
+  function copyCodeToClipboard(codeId) {
+    const codeElement = document.getElementById(codeId);
+    if (!codeElement) {
+      console.error("コード要素が見つかりません");
+      return;
+    }
+
+    const text = codeElement.textContent || "";
+    const button = document.querySelector(`button[data-target="${codeId}"]`);
+    if (!button) {
+      console.error("コピーボタンが見つかりません");
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        const originalText = button.textContent || "";
+
+        button.textContent = "コピーしました！";
+        button.classList.add("bg-green-600");
+
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.classList.remove("bg-green-600");
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("コピーに失敗しました:", err);
+        alert("コピーに失敗しました");
+      });
+  }
+</script>
