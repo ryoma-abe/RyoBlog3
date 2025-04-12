@@ -1,5 +1,5 @@
 ---
-const allPosts = await Astro.glob("../content/blog/*.md");
+const allPosts = await Astro.glob("../../content/blog/*.md");
 const currentPath = Astro.url.pathname;
 
 // カテゴリ一覧を取得（重複排除 & nullチェック）
@@ -13,22 +13,31 @@ const uniqueTags = [
 ---
 
 <div class="w-fit mx-auto text-center">
-  <ul class="flex flex-wrap justify-center gap-2 mt-10">
+  <ul class="flex flex-wrap justify-center gap-3 mt-10">
     {
       uniqueTags.map((tag) => {
         const tagUrl = `/tags/${encodeURIComponent(tag)}`;
         const isActive = currentPath === tagUrl;
 
         return (
-          <li>
+          <li class="relative group">
             <a
               href={tagUrl}
-              class={`px-5 py-2 border transition-colors duration-200 hover:bg-white hover:text-black ${
-                isActive ? "bg-white text-black border-white" : ""
+              class={`px-5 py-2 font-medium transition-colors ${
+                isActive
+                  ? "text-primary pointer-events-none"
+                  : "text-gray-400 group-hover:text-primary"
               }`}
             >
               {tag}
             </a>
+            <span
+              class={`absolute left-0 -bottom-0.5 w-full h-0.5 transition-transform duration-300 ${
+                isActive
+                  ? "bg-red-400"
+                  : "bg-red-400 scale-x-0 group-hover:scale-x-100 origin-left"
+              }`}
+            />
           </li>
         );
       })

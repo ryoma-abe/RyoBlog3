@@ -16,7 +16,7 @@ const paginatedPosts = sortedPosts.slice(start, end);
   {
     paginatedPosts.map((post) => {
       return (
-        <div class="border-primary transition duration-300 hover:scale-105 hover:shadow-lg">
+        <div class="border-primary transition duration-300 hover:scale-102 hover:shadow-lg">
           <a href={`/${post.slug}`} class="block">
             <div
               class={`h-48 flex items-center justify-center text-white text-center ${getTagColor(post.data.tags?.[0] || "その他")}`}
