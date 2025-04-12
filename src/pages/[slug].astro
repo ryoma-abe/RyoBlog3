@@ -1,6 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getNotionPosts, getNotionBlocks, renderBlock } from "../lib/notion";
+import {
+  getNotionPosts,
+  getNotionBlocks,
+  renderBlock,
+  finalizeRenderedContent,
+} from "../lib/notion";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export async function getStaticPaths() {
@@ -18,17 +23,22 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
+
 const title = (post.properties.title as any)?.title?.[0]?.plain_text || "無題";
 const tags = (post.properties.Tags as any)?.multi_select || [];
 const date = (post.properties.date as any)?.date?.start || "";
 
 const blocks = await getNotionBlocks(post.id);
-const content = blocks.map((block) => renderBlock(block)).join("");
+let content = blocks.map((block) => renderBlock(block)).join("");
+
+// 最後のリストを閉じる処理を実行
+content = finalizeRenderedContent(content);
 ---
 
 <Layout title={title}>
   <article class="max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-4">{title}</h1>
+    <h2 class="text-3xl font-bold mb-4">{title}</h2>
+
     <div class="flex gap-2 mb-4">
       {
         tags.map((tag: { name: string }) => (
@@ -38,7 +48,9 @@ const content = blocks.map((block) => renderBlock(block)).join("");
         ))
       }
     </div>
+
     <time class="text-gray-500">{date}</time>
-    <div class="prose mt-8" set:html={content} />
+
+    <div class="prose prose-lg max-w-none mt-8" set:html={content} />
   </article>
 </Layout>
