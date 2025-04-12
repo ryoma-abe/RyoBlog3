@@ -12,21 +12,21 @@ const end = start + POSTS_PER_PAGE;
 const paginatedPosts = sortedPosts.slice(start, end);
 ---
 
-<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-15">
+<div class="grid grid-auto-300 gap-10 mt-15">
   {
     paginatedPosts.map((post) => {
       return (
-        <div class="border">
-          <a href={`/${post.slug}`}>
+        <div class="border-primary transition duration-300 hover:scale-105 hover:shadow-lg">
+          <a href={`/${post.slug}`} class="block">
             <div
-              class={`h-48 p-6 flex items-center justify-center text-white text-center ${getTagColor(post.data.tags?.[0] || "その他")}`}
+              class={`h-48 flex items-center justify-center text-white text-center ${getTagColor(post.data.tags?.[0] || "その他")}`}
             >
               <h3 class="text-xl font-bold">
                 {post.data.thumbnailTitle || post.data.title}
               </h3>
             </div>
-            <div class="p-4">
-              <div class="flex justify-between items-center mb-2">
+            <div class="px-4 py-8">
+              <div class="flex justify-between items-center">
                 <div class="flex gap-2 flex-wrap">
                   {post.data.tags && post.data.tags.length > 0 ? (
                     post.data.tags.map((tag) => {
@@ -49,7 +49,7 @@ const paginatedPosts = sortedPosts.slice(start, end);
                   {formatDate(post.data.date)}
                 </span>
               </div>
-              <h3>{post.data.title}</h3>{" "}
+              <h3 class="mt-5">{post.data.title}</h3>{" "}
             </div>
           </a>
         </div>

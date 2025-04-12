@@ -4,12 +4,14 @@
 :root {
   --color-primary-bg: white;
   --color-primary-text: #333;
+  --color-border: #ddd;
 }
 
 /* ダークモード変数の上書き */
 .dark {
   --color-primary-bg: #333;
   --color-primary-text: white;
+  --color-border: #444;
 }
 
 /* カスタムユーティリティの定義 */
@@ -19,5 +21,15 @@
   }
   .text-primary {
     color: var(--color-primary-text);
+  }
+  .border-primary {
+    @apply border;
+    border-color: var(--color-border);
+  }
+
+  /* グリッド：auto-fit + minmax(400px, 1fr) */
+  .grid-auto-300 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
 }
