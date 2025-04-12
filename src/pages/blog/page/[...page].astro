@@ -1,13 +1,11 @@
 ---
-import { getNotionPosts } from "../../../lib/api/notion.ts";
 import Layout from "../../../layouts/Layout.astro";
+import BlogArea from "../../../components/blog/BlogArea.astro";
 import Pagination from "../../../components/blog/Pagination.astro";
-import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-
-const POSTS_PER_PAGE = 5;
+import { getNotionPosts } from "../../../lib/api/notion.ts";
 
 export async function getStaticPaths() {
-  const POSTS_PER_PAGE = 5;
+  const POSTS_PER_PAGE = 12;
   const allPosts = await getNotionPosts();
   const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 
@@ -17,50 +15,20 @@ export async function getStaticPaths() {
   return paths;
 }
 
+const POSTS_PER_PAGE = 12;
 const allPosts = await getNotionPosts();
 const pageParam = Astro.params.page;
 const currentPage = pageParam ? parseInt(pageParam) : 1;
 const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
-
-// ページ範囲の投稿を抽出
-const start = (currentPage - 1) * POSTS_PER_PAGE;
-const end = start + POSTS_PER_PAGE;
-const posts = allPosts.slice(start, end);
 ---
 
-<Layout>
-  <main class="max-w-4xl mx-auto px-4 py-8 text-white">
-    <h1 class="text-2xl font-bold mb-6">ページ {currentPage}</h1>
-
-    <ul class="space-y-4">
-      {
-        posts.map((post: PageObjectResponse) => {
-          const title =
-            (post.properties.title as any)?.title?.[0]?.plain_text || "無題";
-          const slug =
-            (post.properties.slug as any)?.rich_text?.[0]?.plain_text ||
-            "no-slug";
-          const date = (post.properties.date as any)?.date?.start || "";
-
-          return (
-            <li class="p-4 border rounded">
-              <a
-                href={`/${slug}`}
-                class="text-lg font-semibold hover:underline"
-              >
-                {title}
-              </a>
-              <p class="text-sm text-gray-400">{date}</p>
-            </li>
-          );
-        })
-      }
-    </ul>
-
+<Layout title="ブログ一覧">
+  <BlogArea />
+  <div class="mt-8">
     <Pagination
       currentPage={currentPage}
       totalPages={totalPages}
       baseUrl="/blog/page"
     />
-  </main>
+  </div>
 </Layout>
