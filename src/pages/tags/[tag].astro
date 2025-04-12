@@ -2,18 +2,35 @@
 // src/pages/tags/[tag].astro
 
 import Layout from "../../layouts/Layout.astro";
-import { getAllPosts } from "../../lib/blog";
+import { getNotionPosts } from "../../lib/notion";
+import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import CategoryButton from "../../components/Molecules/CategoryButton.astro";
+import { formatDate } from "../../lib/utils";
+import { getTagColor } from "../../lib/tags";
 
 export async function getStaticPaths() {
-  const allPosts = await getAllPosts();
-  const allTags = [
-    ...new Set(allPosts.flatMap((post) => post.data.tags || [])),
-  ];
+  const allPosts = await getNotionPosts();
 
-  return allTags.map((tag) => {
-    const filteredPosts = allPosts.filter((post) =>
-      post.data.tags?.includes(tag)
-    );
+  // すべてのタグを抽出
+  const allTags = allPosts.flatMap((post) => {
+    const tags = (post.properties.Tags as any)?.multi_select || [];
+    return tags.map((tag: { name: string }) => tag.name);
+  });
+
+  // 重複を削除
+  const uniqueTags = [...new Set(allTags)].filter(Boolean);
+
+  // データがない場合でもページが生成されるようにダミータグを追加
+  if (uniqueTags.length === 0) {
+    uniqueTags.push("CSS", "HTML", "JavaScript", "Astro");
+  }
+
+  return uniqueTags.map((tag) => {
+    // そのタグを持つ投稿をフィルタリング
+    const filteredPosts = allPosts.filter((post) => {
+      const postTags = (post.properties.Tags as any)?.multi_select || [];
+      return postTags.some((t: { name: string }) => t.name === tag);
+    });
 
     return {
       params: { tag },
@@ -26,16 +43,62 @@ const { posts } = Astro.props;
 const { tag } = Astro.params;
 ---
 
-<Layout title=`${tag}の記事一覧`>
-  <div class="mt-10">
-    <ul class="">
+<Layout title={`${tag}の記事一覧`}>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="mt-10">
       {
-        posts.map((post) => (
-          <li>
-            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-          </li>
-        ))
+        posts.length === 0 ? (
+          <p class="text-center text-gray-500">記事が見つかりませんでした</p>
+        ) : (
+          <div class="grid grid-auto-300 gap-10 mt-15">
+            {posts.map((post: PageObjectResponse) => {
+              const title =
+                (post.properties.title as any)?.title?.[0]?.plain_text ||
+                "無題";
+              const slug =
+                (post.properties.slug as any)?.rich_text?.[0]?.plain_text ||
+                "no-slug";
+              const tags = (post.properties.Tags as any)?.multi_select || [];
+              const date = (post.properties.date as any)?.date?.start || "";
+
+              return (
+                <div class="border-primary transition duration-300 hover:scale-102 hover:shadow-lg">
+                  <a href={`/${slug}`} class="block">
+                    <div
+                      class={`h-48 flex items-center justify-center text-white text-center ${getTagColor(tags[0]?.name || "その他")}`}
+                    >
+                      <h3 class="text-xl font-bold">{title}</h3>
+                    </div>
+                    <div class="px-4 py-8">
+                      <div class="flex justify-between items-center">
+                        <div class="flex gap-2 flex-wrap">
+                          {tags.length > 0 ? (
+                            tags.map((tag: { name: string }) => (
+                              <span
+                                class={`text-sm px-3 py-1 rounded-full ${getTagColor(tag.name)} text-white`}
+                              >
+                                {tag.name}
+                              </span>
+                            ))
+                          ) : (
+                            <span class="text-sm px-3 py-1 rounded-full bg-gray-500 text-white">
+                              その他
+                            </span>
+                          )}
+                        </div>
+                        <span class="text-sm text-primary">
+                          {formatDate(date)}
+                        </span>
+                      </div>
+                      <h3 class="mt-5">{title}</h3>
+                    </div>
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        )
       }
-    </ul>
+    </div>
   </div>
 </Layout>
