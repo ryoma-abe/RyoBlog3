@@ -17,10 +17,10 @@ const paginatedPosts = allPosts.slice(start, end);
   {
     paginatedPosts.map((post: PageObjectResponse) => {
       const title =
-        (post.properties.Name as any)?.title?.[0]?.plain_text || "無題";
+        (post.properties.title as any)?.title?.[0]?.plain_text || "無題";
       const slug =
         (post.properties.slug as any)?.rich_text?.[0]?.plain_text || "no-slug";
-      const tags = (post.properties.tags as any)?.multi_select || [];
+      const tags = (post.properties.Tags as any)?.multi_select || [];
       const date = (post.properties.date as any)?.date?.start || "";
 
       return (
