@@ -2,16 +2,16 @@
 
 /* 基本的なカラー変数（ライトモード） */
 :root {
-  --color-primary-bg: white;
+  --color-primary-bg: #f4f3f3;
   --color-primary-text: #333;
   --color-secondary-text: #333;
-  --color-border: #ddd;
+  --color-border: #bcbcbc;
 }
 
 /* ダークモード変数の上書き */
 .dark {
   --color-primary-bg: #333;
-  --color-primary-text: white;
+  --color-primary-text: #f4f3f3;
   --color-border: #bcbcbc;
 }
 
