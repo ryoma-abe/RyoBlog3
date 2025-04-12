@@ -4,6 +4,7 @@
 :root {
   --color-primary-bg: white;
   --color-primary-text: #333;
+  --color-secondary-text: #333;
   --color-border: #ddd;
 }
 
@@ -11,7 +12,7 @@
 .dark {
   --color-primary-bg: #333;
   --color-primary-text: white;
-  --color-border: #444;
+  --color-border: #bcbcbc;
 }
 
 /* カスタムユーティリティの定義 */
@@ -21,6 +22,9 @@
   }
   .text-primary {
     color: var(--color-primary-text);
+  }
+  .text-secondary {
+    color: var(--color-secondary-text);
   }
   .border-primary {
     @apply border;
