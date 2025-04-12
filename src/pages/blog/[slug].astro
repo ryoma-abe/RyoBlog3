@@ -1,6 +1,6 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { getNotionPosts, getNotionBlocks, renderBlock } from "../lib/notion";
+import Layout from "../../layouts/Layout.astro";
+import { getNotionPosts } from "../../lib/notion";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export async function getStaticPaths() {
@@ -19,10 +19,6 @@ const { post } = Astro.props;
 const title = (post.properties.Name as any)?.title?.[0]?.plain_text || "無題";
 const tags = (post.properties.tags as any)?.multi_select || [];
 const date = (post.properties.date as any)?.date?.start || "";
-
-// 記事本文を取得
-const blocks = await getNotionBlocks(post.id);
-const content = blocks.map((block) => renderBlock(block)).join("");
 ---
 
 <Layout title={title}>
@@ -38,56 +34,9 @@ const content = blocks.map((block) => renderBlock(block)).join("");
       }
     </div>
     <time class="text-gray-500">{date}</time>
-    <div class="prose mt-8" set:html={content} />
+    <div class="prose mt-8">
+      {/* ここに記事の本文を表示する処理を追加 */}
+    </div>
   </article>
 </Layout>
 
-<style is:global>
-  .blog-content {
-    margin: 100px auto 0;
-  }
-
-  .blog-content h1 {
-    margin-bottom: 1.5rem;
-  }
-
-  .blog-content h2 {
-    margin: 2rem 0 1rem;
-  }
-
-  .blog-content h3 {
-    margin: 1.5rem 0 1rem;
-  }
-
-  .blog-content p {
-    margin-bottom: 1.5rem;
-  }
-
-  .blog-content pre.astro-code.github-dark {
-    padding: 1rem;
-    margin: 1.5rem 0;
-    overflow-x: auto;
-  }
-
-  .blog-content ul,
-  .blog-content ol {
-    margin: 1.5rem 0;
-    padding-left: 1.5rem;
-  }
-
-  .blog-content li {
-    margin-bottom: 0.5rem;
-  }
-
-  .blog-content img {
-    max-width: 100%;
-    height: auto;
-    margin: 1.5rem 0;
-  }
-
-  @media (max-width: 768px) {
-    .blog-content {
-      padding: 1rem;
-    }
-  }
-</style>
