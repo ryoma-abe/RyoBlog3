@@ -1,5 +1,5 @@
-// src/lib/tags.ts
-import { getAllPosts } from "./blog";
+// src/lib/utils/tags.ts
+import { getAllPosts } from "../api/blog";
 
 // タグ一覧を取得
 export async function getAllTags(includeDrafts = false) {

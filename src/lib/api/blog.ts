@@ -1,4 +1,4 @@
-// src/lib/blog.ts
+// src/lib/api/blog.ts
 import { getCollection, type CollectionEntry } from "astro:content";
 
 export type BlogPost = CollectionEntry<"blog">;
