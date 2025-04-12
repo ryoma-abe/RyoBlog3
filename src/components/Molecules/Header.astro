@@ -8,6 +8,15 @@ const navItems = [
   { href: "/contact", label: "CONTACT" },
 ];
 const currentPath = Astro.url.pathname;
+
+// ブログ関連ページの判定
+const isBlogRelated =
+  currentPath.startsWith("/blog/") ||
+  currentPath.startsWith("/tags/") ||
+  currentPath === "/blog" ||
+  (currentPath.length > 1 &&
+    !currentPath.startsWith("/about") &&
+    !currentPath.startsWith("/contact"));
 ---
 
 <header class="flex justify-between items-center p-4 border-b">
@@ -18,7 +27,13 @@ const currentPath = Astro.url.pathname;
       <ul class="flex space-x-6">
         {
           navItems.map((item) => {
-            const isActive = currentPath === item.href;
+            // TOPは完全一致、BLOGはブログ関連ページでもアクティブに
+            const isActive =
+              (item.label === "TOP" && currentPath === "/") ||
+              (item.label === "BLOG" && isBlogRelated) ||
+              (item.label === "ABOUT" && currentPath.startsWith("/about")) ||
+              (item.label === "CONTACT" && currentPath.startsWith("/contact"));
+
             return (
               <li class="relative group">
                 <a
