@@ -47,6 +47,6 @@ const posts = await getAllPosts();
 
 - `getAllPosts()` は `"blog"` コレクションにある**すべての投稿のメタ情報＋中身**を返す。
 - `getSortedPosts()` で日付順に並び替えたバージョンが欲しいときも便利。
-- `getAllPosts(true)` とすると「下書きも含めた全記事」が取得できる。
+- `getAllPosts(true)` とすると「下書きも含めた全記事」が取得できる。s
 
 ---
