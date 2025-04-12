@@ -95,7 +95,7 @@ function renderRichText(richTextArr: any[] = []): string {
 
 let codeBlockCounter = 0;
 
-export function renderBlock(block: BlockObjectResponse): string {
+export async function renderBlock(block: BlockObjectResponse): Promise<string> {
   // nullチェック
   if (!block) return "";
 
@@ -145,14 +145,14 @@ export function renderBlock(block: BlockObjectResponse): string {
   // リストアイテム以外の場合、現在のリストを閉じる
   if (listItems.length > 0) {
     const html = renderListItems();
-    return html + renderNonListBlock(block);
+    return html + (await renderNonListBlock(block));
   }
 
-  return renderNonListBlock(block);
+  return await renderNonListBlock(block);
 }
 
 // リストアイテム以外のブロックをレンダリング
-function renderNonListBlock(block: BlockObjectResponse): string {
+async function renderNonListBlock(block: BlockObjectResponse): Promise<string> {
   // nullチェック
   if (!block) return "";
 
@@ -207,14 +207,58 @@ function renderNonListBlock(block: BlockObjectResponse): string {
       `;
 
     case "table":
-      // 簡易的なテーブル実装
-      return `<div class="overflow-x-auto my-8">
+      const table = (block as any).table;
+      console.log("Table block:", JSON.stringify(table, null, 2));
+
+      if (!table) {
+        console.log("Table data is missing");
+        return `<div class="overflow-x-auto my-8">
+          <table class="min-w-full border border-gray-300">
+            <tbody>
+              <tr><td class="p-3 border">テーブルデータがありません</td></tr>
+            </tbody>
+          </table>
+        </div>`;
+      }
+
+      // テーブルの子ブロックを取得
+      const tableRows = await notion.blocks.children.list({
+        block_id: block.id,
+      });
+      console.log("Table rows:", JSON.stringify(tableRows, null, 2));
+
+      let tableHtml = `<div class="overflow-x-auto my-8">
         <table class="min-w-full border border-gray-300">
-          <tbody>
-            <tr><td class="p-3 border">テーブルデータ</td></tr>
-          </tbody>
+          <tbody>`;
+
+      tableRows.results.forEach((row: any) => {
+        console.log("Table row:", JSON.stringify(row, null, 2));
+
+        // 行データの取得方法を改善
+        const cells = row.table_row?.cells || [];
+        if (!cells || cells.length === 0) {
+          console.log("Row data is missing");
+          return;
+        }
+
+        tableHtml += "<tr>";
+        cells.forEach((cell: any) => {
+          console.log("Table cell:", JSON.stringify(cell, null, 2));
+
+          // セルデータの取得方法を改善
+          const cellData = Array.isArray(cell) ? cell : cell.rich_text || [];
+          const cellContent =
+            cellData.length > 0 ? renderRichText(cellData) : "&nbsp;";
+          tableHtml += `<td class="p-3 border">${cellContent}</td>`;
+        });
+        tableHtml += "</tr>";
+      });
+
+      tableHtml += `</tbody>
         </table>
       </div>`;
+
+      return tableHtml;
 
     case "divider":
       return `<hr class="my-10 border-t border-gray-300" />`;
