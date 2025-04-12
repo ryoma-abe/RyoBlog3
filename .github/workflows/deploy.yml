@@ -9,24 +9,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Astro site
         run: npm run build
 
-      - name: Setup SSH Key
+      - name: Write SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy via rsync
         run: |
-          rsync -avzr --delete -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.REMOTE_PORT }} -i ~/.ssh/id_rsa" ./dist/ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
+          rsync -avzr --delete \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p ${{ secrets.REMOTE_PORT }}" \
+            ./dist/ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
