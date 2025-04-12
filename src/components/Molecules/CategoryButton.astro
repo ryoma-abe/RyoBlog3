@@ -1,21 +1,30 @@
 ---
-const allPosts = await Astro.glob("../../content/blog/*.md");
+import { getNotionPosts } from "../../lib/notion";
+
+// Notionからの投稿を取得
+const posts = await getNotionPosts();
 const currentPath = Astro.url.pathname;
 
-// カテゴリ一覧を取得（重複排除 & nullチェック）
-const uniqueTags = [
-  ...new Set(
-    allPosts
-      .flatMap((post) => post.frontmatter.tags || [])
-      .filter((tag): tag is string => typeof tag === "string")
-  ),
-];
+// カテゴリ一覧を取得（重複排除）
+const allTags = posts.flatMap((post) => {
+  const tags = (post.properties.Tags as any)?.multi_select || [];
+  return tags.map((tag: { name: string }) => tag.name);
+});
+
+// 重複を排除したタグリスト
+const uniqueTags = [...new Set(allTags)].filter(Boolean);
+
+// データがない場合でもボタンが表示されるようにデフォルトタグを追加
+if (uniqueTags.length === 0) {
+  uniqueTags.push("CSS", "HTML");
+}
 ---
 
 <div class="w-fit mx-auto text-center">
   <ul class="flex flex-wrap justify-center gap-3 mt-10">
     {
       uniqueTags.map((tag) => {
+        // 既存のファイル構造に合わせてURLを構築
         const tagUrl = `/tags/${encodeURIComponent(tag)}`;
         const isActive = currentPath === tagUrl;
 
