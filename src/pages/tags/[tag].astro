@@ -2,11 +2,11 @@
 // src/pages/tags/[tag].astro
 
 import Layout from "../../layouts/Layout.astro";
-import { getNotionPosts } from "../../lib/notion";
+import { getNotionPosts } from "../../lib/api/notion";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import CategoryButton from "../../components/Molecules/CategoryButton.astro";
-import { formatDate } from "../../lib/utils";
-import { getTagColor } from "../../lib/tags";
+import CategoryButton from "../../components/ui/CategoryButton.astro";
+import { formatDate } from "../../lib/utils/utils";
+import { getTagColor } from "../../lib/utils/tags";
 
 export async function getStaticPaths() {
   const allPosts = await getNotionPosts();
