@@ -7,6 +7,7 @@ const navItems = [
   { href: "/about", label: "ABOUT" },
   { href: "/contact", label: "CONTACT" },
 ];
+const currentPath = Astro.url.pathname;
 ---
 
 <header class="flex justify-between items-center p-4 border-b">
@@ -14,18 +15,33 @@ const navItems = [
 
   <div class="flex items-center space-x-10">
     <nav class="hidden md:block">
-      <ul class="flex space-x-8">
+      <ul class="flex space-x-6">
         {
-          navItems.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class={`p-2 hover:underline ${Astro.url.pathname === item.href ? "font-bold text-blue-600" : ""}`}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
+          navItems.map((item) => {
+            const isActive = currentPath === item.href;
+            return (
+              <li class="relative group">
+                <a
+                  href={item.href}
+                  class={`pb-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "text-primary"
+                      : "text-gray-400 group-hover:text-primary"
+                  }`}
+                >
+                  {item.label}
+                </a>
+
+                <span
+                  class={`absolute left-0 -bottom-0.5 w-full h-0.5 transition-all duration-300 ${
+                    isActive
+                      ? "bg-red-400"
+                      : "bg-red-400 scale-x-0 group-hover:scale-x-100 origin-left"
+                  }`}
+                />
+              </li>
+            );
+          })
         }
       </ul>
     </nav>
