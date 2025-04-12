@@ -1,24 +1,26 @@
 // src/lib/utils/tags.ts
-import { getAllPosts } from "../api/blog";
+import { getNotionPosts } from "../api/notion.ts";
 
 // タグ一覧を取得
-export async function getAllTags(includeDrafts = false) {
-  const posts = await getAllPosts(includeDrafts);
-  const allTags = posts.flatMap((post) => post.data.tags || []);
+export async function getAllTags() {
+  const posts = await getNotionPosts();
+  const allTags = posts.flatMap((post) => {
+    const tags = (post.properties.Tags as any)?.multi_select || [];
+    return tags.map((tag: { name: string }) => tag.name);
+  });
   return [...new Set(allTags)];
 }
 
 // タグの出現回数を取得
-export async function getTagCounts(includeDrafts = false) {
-  const posts = await getAllPosts(includeDrafts);
+export async function getTagCounts() {
+  const posts = await getNotionPosts();
   const tagCounts: Record<string, number> = {};
 
   posts.forEach((post) => {
-    if (post.data.tags && Array.isArray(post.data.tags)) {
-      post.data.tags.forEach((tag) => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-      });
-    }
+    const tags = (post.properties.Tags as any)?.multi_select || [];
+    tags.forEach((tag: { name: string }) => {
+      tagCounts[tag.name] = (tagCounts[tag.name] || 0) + 1;
+    });
   });
 
   return tagCounts;
