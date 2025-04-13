@@ -92,7 +92,11 @@ import Layout from "../layouts/Layout.astro";
       />
 
       <!-- リダイレクト設定 -->
-      <input type="hidden" name="redirect" value="/thanks" />
+      <input
+        type="hidden"
+        name="redirect"
+        value={`${Astro.url.origin}/thanks`}
+      />
 
       <!-- サブジェクト設定 -->
       <input
