@@ -32,10 +32,8 @@ if (uniqueTags.length === 0) {
           <li class="relative group">
             <a
               href={tagUrl}
-              class={`px-5 py-2 font-medium transition-colors ${
-                isActive
-                  ? "text-primary pointer-events-none"
-                  : "text-gray-400 group-hover:text-primary"
+              class={`px-5 py-2 font-medium transition-colors text-primary  ${
+                isActive ? "pointer-events-none" : "group-hover:text-primary"
               }`}
             >
               {tag}
