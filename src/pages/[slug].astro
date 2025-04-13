@@ -7,6 +7,7 @@ import {
   finalizeRenderedContent,
 } from "../lib/api/notion";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type { HeadingInfo } from "../lib/api/notion";
 
 export async function getStaticPaths() {
   const posts = await getNotionPosts();
@@ -29,66 +30,135 @@ const tags = (post.properties.Tags as any)?.multi_select || [];
 const date = (post.properties.date as any)?.date?.start || "";
 
 const blocks = await getNotionBlocks(post.id);
-let content = (
-  await Promise.all(blocks.map((block) => renderBlock(block)))
-).join("");
 
-// 最後のリストを閉じる処理を実行
-content = finalizeRenderedContent(content);
+const renderResults = await Promise.all(
+  blocks.map((block) => renderBlock(block))
+);
+
+const { html: content, headings } = finalizeRenderedContent(renderResults);
+
+const showToc = headings && headings.length > 1;
 ---
 
 <Layout title={title}>
   <article class="max-w-4xl mx-auto px-4 py-8">
-    <h2 class="text-3xl font-bold mb-4">{title}</h2>
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
 
-    <div class="flex gap-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-4">
       {
         tags.map((tag: { name: string }) => (
-          <span class="text-sm px-3 py-1 rounded-full border-primary">
+          <span class="text-sm px-3 py-1 rounded-full border border-primary text-primary dark:border-primary-dark dark:text-primary-dark whitespace-nowrap">
             {tag.name}
           </span>
         ))
       }
     </div>
 
-    <time class="text-gray-500">{date}</time>
+    <time class="text-gray-500 dark:text-gray-400 text-sm mb-8 block"
+      >{date}</time
+    >
 
-    <div class="prose prose-lg max-w-none mt-8" set:html={content} />
+    {
+      showToc && (
+        <details
+          class="toc-container bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-10 p-4 group"
+          open
+        >
+          <summary class="cursor-pointer font-semibold text-lg text-gray-800 dark:text-gray-200 list-none flex justify-between items-center">
+            <span>目次</span>
+            <svg
+              class="w-5 h-5 transition-transform duration-200 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </summary>
+          <nav class="mt-3">
+            <ul class="space-y-1.5">
+              {headings.map((heading) => (
+                <li class={`toc-item toc-level-${heading.level}`}>
+                  <a
+                    href={`#${heading.slug}`}
+                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-dark transition-colors duration-150"
+                    style={{ marginLeft: `${(heading.level - 1) * 1.2}rem` }}
+                  >
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </details>
+      )
+    }
+
+    <div
+      class="prose prose-lg dark:prose-invert max-w-none mt-8"
+      set:html={content}
+    />
   </article>
 </Layout>
 
+<style>
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary {
+    list-style: none;
+  }
+</style>
+
 <script>
   // @ts-ignore
-  function copyCodeToClipboard(codeId) {
+  function copyCodeToClipboard(codeId: string) {
     const codeElement = document.getElementById(codeId);
     if (!codeElement) {
-      console.error("コード要素が見つかりません");
+      console.error("コード要素が見つかりません:", codeId);
       return;
     }
 
     const text = codeElement.textContent || "";
-    const button = document.querySelector(`button[data-target="${codeId}"]`);
+    const button = document.querySelector(
+      `button[data-target="${codeId}"]`
+    ) as HTMLButtonElement | null;
     if (!button) {
-      console.error("コピーボタンが見つかりません");
+      console.error("コピーボタンが見つかりません:", codeId);
       return;
     }
 
     navigator.clipboard
-      .writeText(text)
+      .writeText(text.trim())
       .then(() => {
-        const originalText = button.textContent || "";
+        const originalText = button.innerHTML || "コピー";
+        const checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1 inline"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>`;
 
-        button.textContent = "コピーしました！";
-        button.classList.add("bg-green-600");
+        button.innerHTML = `${checkIcon} コピー完了`;
+        button.classList.add("bg-green-600", "text-white");
+        button.classList.remove("bg-gray-700", "hover:bg-gray-600");
+        button.disabled = true;
 
         setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove("bg-green-600");
+          button.innerHTML = originalText;
+          button.classList.remove("bg-green-600", "text-white");
+          button.classList.add("bg-gray-700", "hover:bg-gray-600");
+          button.disabled = false;
         }, 2000);
       })
       .catch((err) => {
         console.error("コピーに失敗しました:", err);
         alert("コピーに失敗しました");
       });
+  }
+
+  if (typeof window !== "undefined") {
+    (window as any).copyCodeToClipboard = copyCodeToClipboard;
   }
 </script>
