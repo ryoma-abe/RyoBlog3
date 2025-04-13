@@ -1,0 +1,32 @@
+{
+  "/": {
+    "title": "RyoBlog | Web制作・Shopify開発の技術ブログ",
+    "description": "RyoBlog（りょうブログ）は、Web制作・Shopify開発・プログラミング学習・AIのノウハウを発信する技術ブログです。Astro × Tailwind CSS × Notion APIで構築された、超高速＆モダンな個人サイトです。",
+    "keywords": [
+      "Web制作",
+      "Shopify",
+      "プログラミング",
+      "フロントエンド",
+      "Tailwind CSS",
+      "Notion API",
+      "Astro",
+      "AI",
+      "技術ブログ"
+    ]
+  },
+  "/about": {
+    "title": "このブログについて | RyoBlog",
+    "description": "RyoBlogの運営目的や自己紹介、使用技術スタックなどをご紹介します。",
+    "keywords": ["自己紹介", "このブログについて", "プロフィール", "運営方針"]
+  },
+  "/contact": {
+    "title": "お問い合わせ | RyoBlog",
+    "description": "RyoBlogへのご質問・ご相談などはこちらからお気軽にお問い合わせください。",
+    "keywords": ["お問い合わせ", "連絡", "フォーム", "相談"]
+  },
+  "/blog": {
+    "title": "記事一覧 | RyoBlog",
+    "description": "RyoBlogの最新記事一覧はこちら。Web制作やShopify、プログラミング学習などに関する記事を掲載中。",
+    "keywords": ["ブログ", "記事一覧", "Web制作", "Shopify", "プログラミング"]
+  }
+}
