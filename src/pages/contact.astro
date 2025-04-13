@@ -1,11 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-// 環境変数からアクセスキーを取得
-// コンソール出力から PUBLIC_WEB3FORMS_ACCESS_KEY が利用可能と判明
-const WEB3FORMS_ACCESS_KEY = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY;
-
-// デバッグコードは削除
 ---
 
 <Layout title="お問い合わせ">
@@ -21,7 +15,11 @@ const WEB3FORMS_ACCESS_KEY = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY;
       method="POST"
       class="space-y-6 bg-secondary p-6 rounded-lg shadow-md"
     >
-      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+      <input
+        type="hidden"
+        name="access_key"
+        value="c4ec8357-4e2a-4ffd-92e2-8b4fef3a61e0"
+      />
 
       <!-- 名前 -->
       <div>
