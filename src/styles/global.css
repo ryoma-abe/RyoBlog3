@@ -33,7 +33,13 @@
   .section-heading {
     @apply text-2xl font-semibold mb-4;
   }
-  /* グリッド：auto-fit + minmax(400px, 1fr) */
+  .main-content {
+    @apply max-w-4xl mx-auto px-4 mt-10;
+  }
+  .contact-input {
+    @apply w-full px-3 py-2 border;
+    border-color: var(--color-border);
+  }
   .grid-auto-300 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
