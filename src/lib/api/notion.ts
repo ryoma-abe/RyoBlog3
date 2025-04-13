@@ -108,11 +108,11 @@ function renderRichText(richTextArr: any[] = []): string {
       if (richText.annotations?.strikethrough) result = `<del>${result}</del>`;
       if (richText.annotations?.underline) result = `<u>${result}</u>`;
       if (richText.annotations?.code)
-        result = `<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-red-500 dark:text-red-400">${result}</code>`; // Style update
+        result = `<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-primary">${result}</code>`; // Style update
 
       // リンク
       if (richText.href) {
-        result = `<a href="${richText.href}" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">${result}</a>`; // Add target and rel
+        result = `<a href="${richText.href}" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">${result}</a>`; // Add target and rel
       }
 
       return result;
@@ -271,7 +271,7 @@ async function renderNonListBlock(
       break; // break を追加
 
     case "quote":
-      html = `<blockquote class="border-l-4 pl-4 my-8 border-gray-300 dark:border-gray-600 italic py-2 text-gray-700 dark:text-gray-300">${renderRichText(
+      html = `<blockquote class="border-l-4 pl-4 my-8">${renderRichText(
         // Style update
         (block as any).quote?.rich_text
       )}</blockquote>`;
@@ -320,7 +320,7 @@ async function renderNonListBlock(
         cells.forEach((cell: any) => {
           // Cell data can be an array of rich text objects
           const cellContent = renderRichText(cell); // Use renderRichText directly
-          html += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${cellContent}</td>`; // Style update
+          html += `<td class="px-6 py-4 whitespace-nowrap text-sm text-primary">${cellContent}</td>`; // Style update
         });
         html += "</tr>";
       });
@@ -342,7 +342,7 @@ async function renderNonListBlock(
         }" class="max-w-full h-auto mx-auto rounded-md shadow-md">
                 ${
                   caption
-                    ? `<figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">${caption}</figcaption>`
+                    ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`
                     : ""
                 }
              </figure>`;
@@ -358,7 +358,7 @@ async function renderNonListBlock(
       const icon = callout?.icon?.emoji || "💡"; // Default icon
       html = `<div class="my-6 p-4 border rounded-md flex items-start space-x-3 bg-blue-50 border-blue-200 dark:bg-gray-800 dark:border-blue-900">
              <span class="text-xl">${icon}</span>
-             <div class="text-blue-800 dark:text-blue-200">${renderRichText(
+             <div class="text-primary">${renderRichText(
                callout?.rich_text
              )}</div>
          </div>`;
@@ -380,8 +380,8 @@ async function renderNonListBlock(
         .join("");
       const summary = renderRichText((block as any).toggle?.rich_text);
       html = `<details class="my-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-                    <summary class="cursor-pointer font-medium text-gray-900 dark:text-gray-100">${summary}</summary>
-                    <div class="mt-2 text-gray-700 dark:text-gray-300">${toggleContent}</div>
+                    <summary class="cursor-pointer font-medium text-primary">${summary}</summary>
+                    <div class="mt-2 text-primary">${toggleContent}</div>
                 </details>`;
       break;
 
