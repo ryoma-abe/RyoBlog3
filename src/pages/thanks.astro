@@ -1,0 +1,44 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="送信完了">
+  <div class="max-w-4xl mx-auto px-4 py-8 text-center">
+    <div class="mb-8">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-24 w-24 mx-auto text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    </div>
+
+    <h1 class="text-3xl font-bold mb-6">お問い合わせありがとうございます</h1>
+
+    <div class="prose prose-lg max-w-none mb-8 mx-auto">
+      <p class="mb-6">
+        メッセージを受け付けました。内容を確認次第、できるだけ早くご返信いたします。
+      </p>
+      <p class="mb-10">
+        通常2〜3営業日以内にご返信いたしますが、状況によって遅れる場合もございますので、ご了承ください。
+      </p>
+    </div>
+
+    <div class="mt-10">
+      <a
+        href="/"
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-200"
+      >
+        トップページに戻る
+      </a>
+    </div>
+  </div>
+</Layout>
+
