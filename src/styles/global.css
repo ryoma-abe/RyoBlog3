@@ -30,7 +30,9 @@
     @apply border;
     border-color: var(--color-border);
   }
-
+  .section-heading {
+    @apply text-2xl font-semibold mb-4;
+  }
   /* グリッド：auto-fit + minmax(400px, 1fr) */
   .grid-auto-300 {
     display: grid;
