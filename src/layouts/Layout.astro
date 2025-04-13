@@ -3,7 +3,13 @@ import CategoryButton from "../components/ui/CategoryButton.astro";
 import Header from "../components/common/Header.astro";
 import Footer from "../components/common/Footer.astro";
 import "../styles/global.css";
-const { title } = Astro.props;
+import { getMeta } from "../lib/utils/meta";
+
+// 現在のパスを取得
+const { pathname } = Astro.url;
+
+// メタ情報を取得
+const { title, description, keywords } = getMeta(pathname);
 ---
 
 <!doctype html>
@@ -11,7 +17,16 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RyoBlog</title>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords.join(", ")} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:image" content="/images/ogp.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href={Astro.url.href} />
     <script is:inline>
       // ローカルストレージから設定を即時取得
       const theme = (() => {
@@ -35,8 +50,8 @@ const { title } = Astro.props;
       }
     </script>
   </head>
-  <Header />
   <body class="bg-primary text-primary">
+    <Header />
     <main>
       <div class="container mx-auto pt-10 pb-20 px-5">
         <h1 class="text-4xl font-bold text-center">{title}</h1>
@@ -49,6 +64,6 @@ const { title } = Astro.props;
         <slot />
       </div>
     </main>
+    <Footer />
   </body>
-  <Footer />
 </html>
