@@ -3,6 +3,7 @@ import Header from "../components/common/Header.astro";
 import Footer from "../components/common/Footer.astro";
 import { getMeta } from "../lib/utils/meta";
 import "../styles/global.css";
+import CategoryButton from "../components/ui/CategoryButton.astro";
 
 const meta = getMeta(Astro.url.pathname);
 
@@ -78,13 +79,11 @@ const isArticlePage =
             <h1 class="text-4xl font-bold text-center">{title}</h1>
           )
         }
-
         {
           title !== "送信完了" &&
             title !== "お問い合わせ" &&
-            title !== "About" && <slot name="category" />
+            title !== "About" && <CategoryButton />
         }
-
         <slot />
       </div>
     </main>
