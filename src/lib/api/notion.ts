@@ -2,6 +2,7 @@ import { Client } from "@notionhq/client";
 import type {
   PageObjectResponse,
   BlockObjectResponse,
+  RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 
 const notion = new Client({
@@ -65,27 +66,53 @@ function renderListItems(): string {
   return html;
 }
 
-// リッチテキストの処理（安全なバージョン）
+// Helper function to generate slugs (Exported) - Updated for non-latin chars
+export function slugify(text: string): string {
+  if (!text) return "";
+  // Keep the original text for non-empty slugs if it's simple enough, otherwise encode.
+  // Simple check: alphanumeric, hyphen, underscore.
+  // If it contains other characters (like Japanese), URL encode it.
+  // Also, convert simple ASCII text to lowercase for consistency.
+  const simplifiedText = text.trim(); // Trim whitespace first
+  if (/^[a-zA-Z0-9-_]+$/.test(simplifiedText)) {
+    // If the text is already simple (ASCII alphanumeric, hyphen, underscore), use it directly after lowercasing.
+    // This keeps simple slugs like "section-1" readable.
+    return simplifiedText.toLowerCase();
+  } else {
+    // For text containing spaces, special characters, or non-latin characters,
+    // 1. Replace spaces with hyphens first for better readability before encoding.
+    // 2. URL encode the entire string to handle all other characters safely.
+    const spacedHyphened = simplifiedText.replace(/\s+/g, "-");
+    return encodeURIComponent(spacedHyphened);
+    // Example: "主要技術 の 進化" -> "主要技術-の-進化" -> "%E4%B8%BB%E8%A6%81%E6%8A%80%E8%A1%93-%E3%81%AE-%E9%80%B2%E5%8C%96"
+  }
+  // Note: This approach might generate long IDs for Japanese text.
+  // Consider libraries like github-slugger for more sophisticated slug generation if needed.
+}
+
+// リッチテキストの処理（安全なバージョン） - プレーンテキスト取得ロジックを修正
 function renderRichText(richTextArr: any[] = []): string {
   if (!richTextArr || richTextArr.length === 0) return "";
 
   return richTextArr
     .map((text) => {
-      if (!text) return "";
+      // Notion API v4 (2022-06-28)以降の型チェックを強化
+      const richText = text as RichTextItemResponse;
+      if (!richText || typeof richText.plain_text !== "string") return "";
 
-      let result = text.plain_text || "";
+      let result = richText.plain_text;
 
       // スタイル適用
-      if (text.annotations?.bold) result = `<strong>${result}</strong>`;
-      if (text.annotations?.italic) result = `<em>${result}</em>`;
-      if (text.annotations?.strikethrough) result = `<del>${result}</del>`;
-      if (text.annotations?.underline) result = `<u>${result}</u>`;
-      if (text.annotations?.code)
-        result = `<code class="bg-gray-100 px-1 py-0.5 rounded">${result}</code>`;
+      if (richText.annotations?.bold) result = `<strong>${result}</strong>`;
+      if (richText.annotations?.italic) result = `<em>${result}</em>`;
+      if (richText.annotations?.strikethrough) result = `<del>${result}</del>`;
+      if (richText.annotations?.underline) result = `<u>${result}</u>`;
+      if (richText.annotations?.code)
+        result = `<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-red-500 dark:text-red-400">${result}</code>`; // Style update
 
       // リンク
-      if (text.href) {
-        result = `<a href="${text.href}" class="text-blue-600 hover:underline">${result}</a>`;
+      if (richText.href) {
+        result = `<a href="${richText.href}" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">${result}</a>`; // Add target and rel
       }
 
       return result;
@@ -93,11 +120,35 @@ function renderRichText(richTextArr: any[] = []): string {
     .join("");
 }
 
+// プレーンテキストのみを取得するヘルパー
+function getPlainText(richTextArr: any[] = []): string {
+  if (!richTextArr || richTextArr.length === 0) return "";
+  return richTextArr
+    .map((text) => (text as RichTextItemResponse)?.plain_text || "")
+    .join("");
+}
+
 let codeBlockCounter = 0;
 
-export async function renderBlock(block: BlockObjectResponse): Promise<string> {
+// 追加: 見出し情報の型定義
+export interface HeadingInfo {
+  level: number;
+  text: string;
+  slug: string;
+}
+
+// 追加: renderBlock の戻り値の型定義
+interface RenderResult {
+  html: string;
+  headingInfo?: HeadingInfo;
+}
+
+export async function renderBlock(
+  block: BlockObjectResponse
+): Promise<RenderResult> {
+  // 戻り値の型を変更
   // nullチェック
-  if (!block) return "";
+  if (!block) return { html: "" }; // オブジェクトを返すように変更
 
   // リストアイテムの処理
   if (
@@ -109,29 +160,22 @@ export async function renderBlock(block: BlockObjectResponse): Promise<string> {
       (block.type === "bulleted_list_item" && currentListType !== "bulleted") ||
       (block.type === "numbered_list_item" && currentListType !== "numbered");
 
+    let prefixHtml = ""; // 前のリストを閉じるHTML
+
     // リストタイプが変わった場合、前のリストを閉じる
     if (isNewListType && listItems.length > 0) {
-      const html = renderListItems();
+      prefixHtml = renderListItems(); // ここで前のリストのHTMLを取得
 
       // 新しいリストタイプを設定
       currentListType =
         block.type === "bulleted_list_item" ? "bulleted" : "numbered";
-
-      // 現在のアイテムを追加
-      const content =
-        block.type === "bulleted_list_item"
-          ? renderRichText((block as any).bulleted_list_item?.rich_text)
-          : renderRichText((block as any).numbered_list_item?.rich_text);
-
-      listItems.push(`<li class="mb-2">${content}</li>`);
-
-      return html;
+    } else if (currentListType === null) {
+      // 最初のリストアイテムの場合、タイプを設定
+      currentListType =
+        block.type === "bulleted_list_item" ? "bulleted" : "numbered";
     }
 
-    // 同じリストタイプなら、リストアイテムを追加
-    currentListType =
-      block.type === "bulleted_list_item" ? "bulleted" : "numbered";
-
+    // 現在のアイテムを追加
     const content =
       block.type === "bulleted_list_item"
         ? renderRichText((block as any).bulleted_list_item?.rich_text)
@@ -139,50 +183,99 @@ export async function renderBlock(block: BlockObjectResponse): Promise<string> {
 
     listItems.push(`<li class="mb-2">${content}</li>`);
 
-    return "";
+    // リストアイテム自体はHTMLを返さないが、リストタイプが変わった場合は前のリストのHTMLを返す
+    return { html: prefixHtml };
   }
 
-  // リストアイテム以外の場合、現在のリストを閉じる
+  // リストアイテム以外の場合、現在のリストがあれば閉じる
+  let prefixHtml = "";
   if (listItems.length > 0) {
-    const html = renderListItems();
-    return html + (await renderNonListBlock(block));
+    prefixHtml = renderListItems();
   }
 
-  return await renderNonListBlock(block);
+  // リスト以外のブロックをレンダリング
+  const nonListResult = await renderNonListBlock(block);
+
+  // 前のリストHTMLと現在のブロックHTMLを結合
+  return {
+    html: prefixHtml + nonListResult.html,
+    headingInfo: nonListResult.headingInfo, // 見出し情報を伝播
+  };
 }
 
-// リストアイテム以外のブロックをレンダリング
-async function renderNonListBlock(block: BlockObjectResponse): Promise<string> {
+// リストアイテム以外のブロックをレンダリング (戻り値の型を変更)
+async function renderNonListBlock(
+  block: BlockObjectResponse
+): Promise<RenderResult> {
   // nullチェック
-  if (!block) return "";
+  if (!block) return { html: "" };
 
   const { type } = block;
+  let headingInfo: HeadingInfo | undefined = undefined; // 見出し情報用変数
+  let html = ""; // HTML用変数
 
   switch (type) {
     case "paragraph":
-      return `<p class="my-6 leading-relaxed">${renderRichText(
+      html = `<p class="my-6 leading-relaxed">${renderRichText(
         (block as any).paragraph?.rich_text
       )}</p>`;
+      break; // break を追加
 
     case "heading_1":
-      return `<h1 class="text-3xl font-bold mt-10 mb-6">${renderRichText(
-        (block as any).heading_1?.rich_text
-      )}</h1>`;
+      const h1RichText = (block as any).heading_1?.rich_text;
+      const h1Text = getPlainText(h1RichText); // プレーンテキスト取得
+      const h1Slug = slugify(h1Text);
+      if (h1Text && h1Slug) {
+        // テキストとスラッグがある場合のみ
+        html = `<h1 id="${h1Slug}" class="text-3xl font-bold mt-10 mb-6">${renderRichText(
+          h1RichText
+        )}</h1>`; // scroll-mt-20 を削除
+        headingInfo = { level: 1, text: h1Text, slug: h1Slug };
+      } else {
+        html = `<h1 class="text-3xl font-bold mt-10 mb-6">${renderRichText(
+          h1RichText
+        )}</h1>`; // Fallback if text is empty
+      }
+      break; // break を追加
 
     case "heading_2":
-      return `<h2 class="text-2xl font-bold mt-8 mb-4">${renderRichText(
-        (block as any).heading_2?.rich_text
-      )}</h2>`;
+      const h2RichText = (block as any).heading_2?.rich_text;
+      const h2Text = getPlainText(h2RichText);
+      const h2Slug = slugify(h2Text);
+      if (h2Text && h2Slug) {
+        html = `<h2 id="${h2Slug}" class="text-2xl font-bold mt-8 mb-4">${renderRichText(
+          h2RichText
+        )}</h2>`; // scroll-mt-20 を削除
+        headingInfo = { level: 2, text: h2Text, slug: h2Slug };
+      } else {
+        html = `<h2 class="text-2xl font-bold mt-8 mb-4">${renderRichText(
+          h2RichText
+        )}</h2>`;
+      }
+      break; // break を追加
 
     case "heading_3":
-      return `<h3 class="text-xl font-bold mt-6 mb-3">${renderRichText(
-        (block as any).heading_3?.rich_text
-      )}</h3>`;
+      const h3RichText = (block as any).heading_3?.rich_text;
+      const h3Text = getPlainText(h3RichText);
+      const h3Slug = slugify(h3Text);
+      if (h3Text && h3Slug) {
+        html = `<h3 id="${h3Slug}" class="text-xl font-bold mt-6 mb-3">${renderRichText(
+          h3RichText
+        )}</h3>`; // scroll-mt-20 を削除
+        headingInfo = { level: 3, text: h3Text, slug: h3Slug };
+      } else {
+        html = `<h3 class="text-xl font-bold mt-6 mb-3">${renderRichText(
+          h3RichText
+        )}</h3>`;
+      }
+      break; // break を追加
 
     case "quote":
-      return `<blockquote class="border-l-4 pl-4 my-8 border-gray-300 italic py-2">${renderRichText(
+      html = `<blockquote class="border-l-4 pl-4 my-8 border-gray-300 dark:border-gray-600 italic py-2 text-gray-700 dark:text-gray-300">${renderRichText(
+        // Style update
         (block as any).quote?.rich_text
       )}</blockquote>`;
+      break; // break を追加
 
     case "code":
       codeBlockCounter++;
@@ -190,136 +283,141 @@ async function renderNonListBlock(block: BlockObjectResponse): Promise<string> {
       const codeContent = renderRichText((block as any).code?.rich_text);
       const language = (block as any).code?.language || "plaintext";
 
-      return `
+      html = `
         <div class="code-block-container relative my-8 bg-gray-800 rounded-md overflow-hidden">
           <div class="flex justify-between items-center px-4 py-2 bg-gray-900 text-gray-300">
             <span class="text-xs font-mono">${language}</span>
-            <button 
-              class="copy-button bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded" 
+            <button
+              class="copy-button bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded transition-colors duration-200"
               data-target="${codeId}"
               onclick="copyCodeToClipboard('${codeId}')"
             >
               コピー
             </button>
           </div>
-          <pre class="p-4 overflow-auto"><code id="${codeId}" class="text-gray-100">${codeContent}</code></pre>
+          <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="text-gray-100 language-${language}">${codeContent}</code></pre> // Add language class, adjust text size
         </div>
       `;
+      break; // break を追加
 
+    // テーブル処理を簡略化・堅牢化
     case "table":
-      const table = (block as any).table;
-      console.log("Table block:", JSON.stringify(table, null, 2));
-
-      if (!table) {
-        console.log("Table data is missing");
-        return `<div class="overflow-x-auto my-8">
-          <table class="min-w-full border border-gray-300">
-            <tbody>
-              <tr><td class="p-3 border">テーブルデータがありません</td></tr>
-            </tbody>
-          </table>
-        </div>`;
-      }
-
-      // テーブルの子ブロックを取得
       const tableRows = await notion.blocks.children.list({
         block_id: block.id,
       });
-      console.log("Table rows:", JSON.stringify(tableRows, null, 2));
 
-      let tableHtml = `<div class="overflow-x-auto my-8">
-        <table class="min-w-full border border-gray-300">
-          <tbody>`;
+      html = `<div class="overflow-x-auto my-8 border border-gray-200 dark:border-gray-700 rounded-md">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">`;
 
       tableRows.results.forEach((row: any) => {
-        console.log("Table row:", JSON.stringify(row, null, 2));
+        if (row.type !== "table_row") return; // Ensure it's a table_row
 
-        // 行データの取得方法を改善
         const cells = row.table_row?.cells || [];
-        if (!cells || cells.length === 0) {
-          console.log("Row data is missing");
-          return;
-        }
+        if (!cells || cells.length === 0) return;
 
-        tableHtml += "<tr>";
+        html += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">'; // Add hover effect
         cells.forEach((cell: any) => {
-          console.log("Table cell:", JSON.stringify(cell, null, 2));
-
-          // セルデータの取得方法を改善
-          const cellData = Array.isArray(cell) ? cell : cell.rich_text || [];
-          const cellContent =
-            cellData.length > 0 ? renderRichText(cellData) : "&nbsp;";
-          tableHtml += `<td class="p-3 border">${cellContent}</td>`;
+          // Cell data can be an array of rich text objects
+          const cellContent = renderRichText(cell); // Use renderRichText directly
+          html += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${cellContent}</td>`; // Style update
         });
-        tableHtml += "</tr>";
+        html += "</tr>";
       });
 
-      tableHtml += `</tbody>
+      html += `</tbody>
         </table>
       </div>`;
-
-      return tableHtml;
-
-    case "divider":
-      return `<hr class="my-10 border-t border-gray-300" />`;
+      break; // break を追加
 
     case "image":
-      const imageType = (block as any).image?.type || "external";
+      const image = (block as any).image;
       const imageUrl =
-        imageType === "external"
-          ? (block as any).image?.external?.url || ""
-          : (block as any).image?.file?.url || "";
-      const caption = renderRichText((block as any).image?.caption);
+        image?.type === "external" ? image.external.url : image?.file?.url;
+      const caption = renderRichText(image?.caption);
+      if (imageUrl) {
+        html = `<figure class="my-8">
+                <img src="${imageUrl}" alt="${
+          caption || "Image from Notion"
+        }" class="max-w-full h-auto mx-auto rounded-md shadow-md">
+                ${
+                  caption
+                    ? `<figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">${caption}</figcaption>`
+                    : ""
+                }
+             </figure>`;
+      }
+      break;
 
-      return `<figure class="my-8">
-        <img src="${imageUrl}" alt="${
-        caption || "Image"
-      }" class="max-w-full h-auto rounded-lg" />
-        ${
-          caption
-            ? `<figcaption class="text-center text-sm text-gray-500 mt-3">${caption}</figcaption>`
-            : ""
-        }
-      </figure>`;
+    case "divider":
+      html = `<hr class="my-8 border-gray-200 dark:border-gray-700">`;
+      break;
+
+    case "callout":
+      const callout = (block as any).callout;
+      const icon = callout?.icon?.emoji || "💡"; // Default icon
+      html = `<div class="my-6 p-4 border rounded-md flex items-start space-x-3 bg-blue-50 border-blue-200 dark:bg-gray-800 dark:border-blue-900">
+             <span class="text-xl">${icon}</span>
+             <div class="text-blue-800 dark:text-blue-200">${renderRichText(
+               callout?.rich_text
+             )}</div>
+         </div>`;
+      break;
+
+    case "toggle":
+      // Get toggle children recursively
+      const toggleChildren = await notion.blocks.children.list({
+        block_id: block.id,
+      });
+      const toggleContent = (
+        await Promise.all(
+          toggleChildren.results.map((child) =>
+            renderBlock(child as BlockObjectResponse)
+          )
+        )
+      )
+        .map((res) => res.html)
+        .join("");
+      const summary = renderRichText((block as any).toggle?.rich_text);
+      html = `<details class="my-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                    <summary class="cursor-pointer font-medium text-gray-900 dark:text-gray-100">${summary}</summary>
+                    <div class="mt-2 text-gray-700 dark:text-gray-300">${toggleContent}</div>
+                </details>`;
+      break;
+
+    // 他のブロックタイプも必要に応じて追加...
+    case "child_page":
+      html = `<div class="my-4 p-3 border rounded-md bg-gray-100 dark:bg-gray-700"><p class="font-medium">Child Page: ${
+        (block as any).child_page?.title || "Untitled"
+      }</p></div>`; // Basic rendering
+      break;
+
+    case "unsupported":
+      console.warn("Unsupported block type:", block.type);
+      html = ""; // Or render a placeholder
+      break;
 
     default:
-      return `<div class="text-gray-500 my-4">未対応ブロック: ${type}</div>`;
+      console.warn("Unhandled block type:", type);
+      html = ""; // Or render a placeholder
   }
+  return { html, headingInfo }; // 結果オブジェクトを返す
 }
 
-// 最後のリストを閉じる処理
-export function finalizeRenderedContent(content: string): string {
-  // コードブロックのコピー機能用のJavaScriptを追加
-  const copyScript = `
-    <script>
-      function copyCodeToClipboard(codeId) {
-        const codeElement = document.getElementById(codeId);
-        const text = codeElement.textContent;
-        
-        navigator.clipboard.writeText(text).then(() => {
-          const button = document.querySelector(\`button[data-target="\${codeId}"]\`);
-          const originalText = button.textContent;
-          
-          button.textContent = 'コピーしました！';
-          button.classList.add('bg-green-600');
-          
-          setTimeout(() => {
-            button.textContent = originalText;
-            button.classList.remove('bg-green-600');
-          }, 2000);
-        }).catch(err => {
-          console.error('コピーに失敗しました:', err);
-          alert('コピーに失敗しました');
-        });
-      }
-    </script>
-  `;
+// 最後のリストを閉じる処理を実行 (renderBlock の結果を受け取るように変更)
+export function finalizeRenderedContent(results: RenderResult[]): {
+  html: string;
+  headings: HeadingInfo[];
+} {
+  let finalHtml = results.map((r) => r.html).join("");
+  const headings = results
+    .filter((r) => r.headingInfo)
+    .map((r) => r.headingInfo as HeadingInfo);
 
-  // リストを閉じる処理
-  let finalContent = content;
+  // ループの最後にリストが残っている場合、ここで閉じる
   if (listItems.length > 0) {
-    finalContent += renderListItems();
+    finalHtml += renderListItems();
   }
 
-  return finalContent + copyScript;
+  return { html: finalHtml, headings };
 }
