@@ -295,7 +295,7 @@ async function renderNonListBlock(
               コピー
             </button>
           </div>
-          <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="text-gray-100 language-${language}">${codeContent}</code></pre> // Add language class, adjust text size
+          <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="text-gray-100 language-${language}">${codeContent}</code></pre>
         </div>
       `;
       break; // break を追加
