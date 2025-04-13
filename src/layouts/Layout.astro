@@ -29,10 +29,10 @@ const isArticlePage =
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url.href} />
-    <meta property="og:image" content="/images/ogp.png" />
+    <meta property="og:url" content={Astro.site} />
+    <meta property="og:image" content={`${Astro.site}/images/ogp.png`} />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="canonical" href={Astro.url.href} />
+    <link rel="canonical" href={Astro.site} />
     <link rel="icon" href="/favicon.png" type="image/png" />
 
     <script is:inline>
