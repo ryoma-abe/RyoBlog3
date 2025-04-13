@@ -1,15 +1,21 @@
 ---
-import CategoryButton from "../components/ui/CategoryButton.astro";
 import Header from "../components/common/Header.astro";
 import Footer from "../components/common/Footer.astro";
-import "../styles/global.css";
 import { getMeta } from "../lib/utils/meta";
+import "../styles/global.css";
 
-// 現在のパスを取得
-const { pathname } = Astro.url;
+const meta = getMeta(Astro.url.pathname);
 
-// メタ情報を取得
-const { title, description, keywords } = getMeta(pathname);
+const title = Astro.props.title ?? meta.title;
+const description = Astro.props.description ?? meta.description;
+const keywords = Astro.props.keywords ?? meta.keywords;
+
+// 記事詳細ページかどうか（例: /test-article のような1階層のみ）
+const isArticlePage =
+  /^\/[^\/]+$/.test(Astro.url.pathname) &&
+  !["/about", "/contact", "/blog", "thanks", "/blog"].includes(
+    Astro.url.pathname
+  );
 ---
 
 <!doctype html>
@@ -27,8 +33,9 @@ const { title, description, keywords } = getMeta(pathname);
     <meta property="og:image" content="/images/ogp.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href={Astro.url.href} />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+
     <script is:inline>
-      // ローカルストレージから設定を即時取得
       const theme = (() => {
         if (
           typeof localStorage !== "undefined" &&
@@ -42,7 +49,6 @@ const { title, description, keywords } = getMeta(pathname);
         return "light";
       })();
 
-      // HTML要素にダークモードクラスをすぐに適用（ページレンダリング前）
       if (theme === "dark") {
         document.documentElement.classList.add("dark");
       } else {
@@ -54,13 +60,18 @@ const { title, description, keywords } = getMeta(pathname);
     <Header />
     <main>
       <div class="container mx-auto pt-10 pb-20 px-5">
-        <h1 class="text-4xl font-bold text-center">{title}</h1>
+        {
+          !isArticlePage && (
+            <h1 class="text-4xl font-bold text-center">{title}</h1>
+          )
+        }
 
         {
           title !== "送信完了" &&
             title !== "お問い合わせ" &&
-            title !== "About" && <CategoryButton />
+            title !== "About" && <slot name="category" />
         }
+
         <slot />
       </div>
     </main>
