@@ -6,8 +6,12 @@ import {
   renderBlock,
   finalizeRenderedContent,
 } from "../lib/api/notion";
-import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type {
+  PageObjectResponse,
+  BlockObjectResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import type { HeadingInfo } from "../lib/api/notion";
+import LinkButton from "../components/Atoms/LinkButton.astro";
 
 export async function getStaticPaths() {
   const posts = await getNotionPosts();
@@ -34,7 +38,7 @@ const currentSlug =
 const blocks = await getNotionBlocks(post.id);
 
 const renderResults = await Promise.all(
-  blocks.map((block) => renderBlock(block))
+  blocks.map((block: BlockObjectResponse) => renderBlock(block))
 );
 
 const { html: content, headings } = finalizeRenderedContent(renderResults);
@@ -104,7 +108,7 @@ const relatedPosts = allPosts
           </summary>
           <nav class="mt-3">
             <ul class="space-y-1.5">
-              {headings.map((heading) => (
+              {headings.map((heading: HeadingInfo) => (
                 <li class={`toc-item toc-level-${heading.level}`}>
                   <a
                     href={`#${heading.slug}`}
@@ -125,6 +129,10 @@ const relatedPosts = allPosts
       class="prose prose-lg dark:prose-invert max-w-none mt-8"
       set:html={content}
     />
+
+    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <LinkButton href="/blog/page"> &larr; 一覧へ戻る </LinkButton>
+    </div>
   </article>
 
   {
