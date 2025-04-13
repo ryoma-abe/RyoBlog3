@@ -32,7 +32,9 @@ const isBlogRelated =
               (item.label === "TOP" && currentPath === "/") ||
               (item.label === "BLOG" && isBlogRelated) ||
               (item.label === "ABOUT" && currentPath.startsWith("/about")) ||
-              (item.label === "CONTACT" && currentPath.startsWith("/contact"));
+              (item.label === "CONTACT" &&
+                (currentPath.startsWith("/contact") ||
+                  currentPath.startsWith("/thanks")));
 
             return (
               <li class="relative group">
