@@ -82,7 +82,8 @@ const isArticlePage =
         {
           title !== "送信完了" &&
             title !== "お問い合わせ" &&
-            title !== "About" && <CategoryButton />
+            title !== "About" &&
+            !isArticlePage && <CategoryButton />
         }
         <slot />
       </div>
