@@ -16,7 +16,8 @@ const isBlogRelated =
   currentPath === "/blog" ||
   (currentPath.length > 1 &&
     !currentPath.startsWith("/about") &&
-    !currentPath.startsWith("/contact"));
+    !currentPath.startsWith("/contact") &&
+    !currentPath.startsWith("/thanks"));
 ---
 
 <header class="flex justify-between items-center p-4 border-b">
