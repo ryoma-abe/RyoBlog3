@@ -40,7 +40,12 @@ const { title } = Astro.props;
     <main>
       <div class="container mx-auto pt-10 pb-20 px-5">
         <h1 class="text-4xl font-bold text-center">{title}</h1>
-        <CategoryButton />
+
+        {
+          title !== "送信完了" &&
+            title !== "お問い合わせ" &&
+            title !== "About" && <CategoryButton />
+        }
         <slot />
       </div>
     </main>
