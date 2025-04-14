@@ -8,6 +8,9 @@ import CategoryButton from "../components/ui/CategoryButton.astro";
 const meta = getMeta(Astro.url.pathname);
 
 const title = Astro.props.title ?? meta.title;
+const description = Astro.props.description ?? meta.description;
+const keywords = Astro.props.keywords ?? meta.keywords;
+const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
 
 // 記事詳細ページかどうか（例: /test-article のような1階層のみ）
 const isArticlePage =
@@ -24,20 +27,11 @@ console.log(`Path: ${Astro.url.pathname}, isArticlePage: ${isArticlePage}`);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RyoBlog</title>
-    <meta
-      name="description"
-      content="RyoBlog（りょうブログ）は、Web制作・Shopify開発・プログラミング学習・AIのノウハウを発信する技術ブログです。Astro × Tailwind CSS × Notion APIで構築された、超高速＆モダンな個人サイトです。"
-    />
-    <meta
-      name="keywords"
-      content="Web制作, Shopify, プログラミング, フロントエンド, Tailwind CSS, Notion API, Astro, AI, 技術ブログ"
-    />
-    <meta property="og:title" content="RyoBlog" />
-    <meta
-      property="og:description"
-      content="RyoBlog（りょうブログ）は、Web制作・Shopify開発・プログラミング学習・AIのノウハウを発信する技術ブログです。Astro × Tailwind CSS × Notion APIで構築された、超高速＆モダンな個人サイトです。"
-    />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywordsString} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://web-ryoma.conohawing.com/" />
     <meta
@@ -73,7 +67,7 @@ console.log(`Path: ${Astro.url.pathname}, isArticlePage: ${isArticlePage}`);
   <body class="bg-primary text-primary">
     <Header />
     <main>
-      <div class="container mx-auto pt-10 pb-20 px-5">
+      <div class="container mx-auto py-20 px-5">
         {
           isArticlePage === false && (
             <h1 class="text-4xl font-bold text-center">{title}</h1>

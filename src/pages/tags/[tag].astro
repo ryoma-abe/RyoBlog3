@@ -41,7 +41,7 @@ const { tag } = Astro.params;
 ---
 
 <Layout title={`${tag}の記事一覧`}>
-  <div class="px-4 py-8">
+  <div class="mt-20">
     {
       posts.length === 0 ? (
         <p class="text-center text-gray-500">記事が見つかりませんでした</p>
