@@ -1,0 +1,43 @@
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  class?: string;
+}
+
+const { src, alt, caption, class: className = '' } = Astro.props;
+
+// リモート画像をロードする
+// データは動的に読み込まれるため、remotePatternのセットアップが必要
+// リモート画像をWebPに変換するための実装
+const imageUrl = new URL(src);
+
+// 画像のフォーマットとサイズの最適化オプション
+const optimizedImageProps = {
+  src,
+  alt,
+  width: 800, // デフォルトの最大幅
+  height: undefined, // 高さは自動調整
+  loading: "lazy",
+  decoding: "async",
+  format: "webp", // WebP形式に変換
+  quality: 80,
+  class: `max-w-full h-auto mx-auto rounded-md shadow-md ${className}`
+};
+
+<figure class="my-8">
+  <Image {...optimizedImageProps} />
+  {caption && 
+    <figcaption class="text-center text-sm text-muted-foreground mt-2" set:html={caption} />
+  }
+</figure>
+
+<style>
+  /* 必要に応じて画像のスタイリングを追加 */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+</style> 
