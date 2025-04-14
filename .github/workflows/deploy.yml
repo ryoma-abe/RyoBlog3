@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Fetch Notion images and convert to WebP # ← 追加
+        run: npm run fetch-images
+
       - name: Build Astro site
         run: npm run build
 

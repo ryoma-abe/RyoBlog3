@@ -332,21 +332,22 @@ async function renderNonListBlock(
 
     case "image":
       const image = (block as any).image;
-      const imageUrl =
-        image?.type === "external" ? image.external.url : image?.file?.url;
       const caption = renderRichText(image?.caption);
-      if (imageUrl) {
-        html = `<figure class="my-8">
-                <img src="${imageUrl}" alt="${
-          caption || "Image from Notion"
-        }" class="max-w-full h-auto mx-auto rounded-md shadow-md">
-                ${
-                  caption
-                    ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`
-                    : ""
-                }
-             </figure>`;
-      }
+
+      // NotionブロックIDからファイル名を生成（ハイフン削除）
+      const imageId = block.id.replace(/-/g, "");
+      const localImagePath = `/images/notion/${imageId}.webp`;
+
+      html = `<figure class="my-8">
+          <img src="${localImagePath}" alt="${
+        caption || "画像"
+      }" class="max-w-full h-auto mx-auto rounded-md shadow-md" loading="lazy" />
+          ${
+            caption
+              ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`
+              : ""
+          }
+        </figure>`;
       break;
 
     case "divider":
