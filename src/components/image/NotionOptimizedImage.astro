@@ -1,4 +1,5 @@
-import { Image } from 'astro:assets';
+---
+import { Image } from "astro:assets";
 
 interface Props {
   src: string;
@@ -6,36 +7,41 @@ interface Props {
   width?: number;
   height?: number;
   caption?: string;
-  format?: 'webp' | 'avif' | 'png' | 'jpeg';
+  format?: "webp" | "avif" | "png" | "jpeg";
   quality?: number;
 }
 
-const { 
-  src, 
-  alt, 
-  width = 800, 
-  height = 600, 
-  caption, 
-  format = 'webp',
-  quality = 80
+const {
+  src,
+  alt,
+  width = 800,
+  height = 600,
+  caption,
+  format = "webp",
+  quality = 80,
 } = Astro.props;
 
-// 外部URLの場合、リモート画像として処理
-const remoteImageSrc = new URL(src);
+// Astroの画像コンポーネントで外部URLを使用するために文字列のままsrcを渡す
+---
 
 <figure class="my-8">
-  <Image 
-    src={remoteImageSrc}
+  <img
+    src={src}
     alt={alt}
     width={width}
     height={height}
-    format={format}
-    quality={quality}
+    loading="lazy"
+    decoding="async"
     class="max-w-full h-auto mx-auto rounded-md shadow-md"
   />
-  {caption && (
-    <figcaption class="text-center text-sm text-muted-foreground mt-2" set:html={caption} />
-  )}
+  {
+    caption && (
+      <figcaption
+        class="text-center text-sm text-muted-foreground mt-2"
+        set:html={caption}
+      />
+    )
+  }
 </figure>
 
 <style>
