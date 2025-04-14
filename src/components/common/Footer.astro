@@ -26,6 +26,15 @@ const socialLinks = [
           target="_blank"
           rel="noopener noreferrer"
           class="hover:text-blue-600 transition-colors"
+          aria-label={
+            link.href.includes("x.com")
+              ? "Twitter"
+              : link.href.includes("github")
+                ? "GitHub"
+                : link.href.includes("instagram")
+                  ? "Instagram"
+                  : "ソーシャルメディア"
+          }
         >
           <span class="w-5 h-5" set:html={link.icon} />
         </a>
