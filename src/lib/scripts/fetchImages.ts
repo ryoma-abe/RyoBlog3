@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
-import { getNotionPosts, getNotionBlocks } from "../api/notion";
+import { getNotionPosts, getNotionBlocks } from "../api/notion.js";
 
 // Node.js 組み込みの fetch を使う（Node 18+）
 const fetch = globalThis.fetch;

@@ -7,7 +7,7 @@
     "build": "npm run fetch-images && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "fetch-images": "tsc -p tsconfig.fetch.json && node .fetch-tmp/fetchImages.js",
+    "fetch-images": "node -r dotenv/config --loader=ts-node/esm src/lib/scripts/fetchImages.ts",
     "clean-fetch": "rm -rf .fetch-tmp"
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "tailwindcss": "^4.1.3"
   },
   "devDependencies": {
+    "dotenv": "^16.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

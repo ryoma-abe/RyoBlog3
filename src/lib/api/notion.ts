@@ -6,10 +6,10 @@ import type {
 } from "@notionhq/client/build/src/api-endpoints";
 
 const notion = new Client({
-  auth: import.meta.env.NOTION_API_KEY,
+  auth: process.env.NOTION_API_KEY || "",
 });
 
-const databaseId = import.meta.env.NOTION_DATABASE_ID;
+const databaseId = process.env.NOTION_DATABASE_ID || "";
 
 if (!databaseId) {
   throw new Error(
