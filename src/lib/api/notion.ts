@@ -226,16 +226,15 @@ async function renderNonListBlock(
 
     case "heading_1":
       const h1RichText = (block as any).heading_1?.rich_text;
-      const h1Text = getPlainText(h1RichText); // プレーンテキスト取得
+      const h1Text = getPlainText(h1RichText);
       const h1Slug = slugify(h1Text);
       if (h1Text && h1Slug) {
-        // テキストとスラッグがある場合のみ
-        html = `<h1 id="${h1Slug}" class="text-3xl font-bold mt-10 mb-6 pb-2 border-b-2 border-primary/30 dark:border-primary/20">${renderRichText(
+        html = `<h1 id="${h1Slug}" class="text-3xl font-bold mt-10 mb-6 pb-2 border-b-2 border-red-400">${renderRichText(
           h1RichText
         )}</h1>`;
         headingInfo = { level: 1, text: h1Text, slug: h1Slug };
       } else {
-        html = `<h1 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b-2 border-primary/30 dark:border-primary/20">${renderRichText(
+        html = `<h1 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b-2 border-red-400">${renderRichText(
           h1RichText
         )}</h1>`;
       }
@@ -246,12 +245,12 @@ async function renderNonListBlock(
       const h2Text = getPlainText(h2RichText);
       const h2Slug = slugify(h2Text);
       if (h2Text && h2Slug) {
-        html = `<h2 id="${h2Slug}" class="text-2xl font-bold mt-8 mb-4 pb-1 border-b border-primary/20 dark:border-primary/10">${renderRichText(
+        html = `<h2 id="${h2Slug}" class="text-2xl font-bold mt-8 mb-4 p-4 border border-dashed border-red-400">${renderRichText(
           h2RichText
         )}</h2>`;
         headingInfo = { level: 2, text: h2Text, slug: h2Slug };
       } else {
-        html = `<h2 class="text-2xl font-bold mt-8 mb-4 pb-1 border-b border-primary/20 dark:border-primary/10">${renderRichText(
+        html = `<h2 class="text-2xl font-bold mt-8 mb-4 pb-1 border-b border-red-400">${renderRichText(
           h2RichText
         )}</h2>`;
       }
@@ -262,19 +261,19 @@ async function renderNonListBlock(
       const h3Text = getPlainText(h3RichText);
       const h3Slug = slugify(h3Text);
       if (h3Text && h3Slug) {
-        html = `<h3 id="${h3Slug}" class="text-xl font-bold mt-6 mb-3 pl-2 border-l-4 border-primary/30 dark:border-primary/20">${renderRichText(
+        html = `<h3 id="${h3Slug}" class="text-xl font-bold mt-6 mb-3 pl-2 border-l-4 border-red-400">${renderRichText(
           h3RichText
         )}</h3>`;
         headingInfo = { level: 3, text: h3Text, slug: h3Slug };
       } else {
-        html = `<h3 class="text-xl font-bold mt-6 mb-3 pl-2 border-l-4 border-primary/30 dark:border-primary/20">${renderRichText(
+        html = `<h3 class="text-xl font-bold mt-6 mb-3 pl-2 border-l-4 border-red-400">${renderRichText(
           h3RichText
         )}</h3>`;
       }
       break;
 
     case "quote":
-      html = `<blockquote class="border-l-4 border-primary/50 dark:border-primary/30 pl-4 py-2 my-8 bg-gray-50 dark:bg-gray-800 rounded-r-md italic">${renderRichText(
+      html = `<blockquote class="border-l-4 border-red-400 pl-4 py-2 my-8 bg-red-50 dark:bg-gray-800 rounded-r-md italic">${renderRichText(
         (block as any).quote?.rich_text
       )}</blockquote>`;
       break;
@@ -312,14 +311,17 @@ async function renderNonListBlock(
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">`;
 
-      tableRows.results.forEach((row: any) => {
+      tableRows.results.forEach((row: any, rowIndex: number) => {
         if (row.type !== "table_row") return; // Ensure it's a table_row
 
         const cells = row.table_row?.cells || [];
         if (!cells || cells.length === 0) return;
 
-        html +=
-          '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">'; // Add hover effect and transition
+        const isFirstRow = rowIndex === 0;
+        html += isFirstRow
+          ? '<tr class="bg-red-50/30 dark:bg-red-900/10 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-150">'
+          : '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">';
+
         cells.forEach((cell: any) => {
           // Cell data can be an array of rich text objects
           const cellContent = renderRichText(cell); // Use renderRichText directly
@@ -353,13 +355,13 @@ async function renderNonListBlock(
       break;
 
     case "divider":
-      html = `<hr class="my-8 h-px border-0 bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent">`;
+      html = `<hr class="my-8 h-px border-0 bg-gradient-to-r from-transparent via-red-400 dark:via-red-500 to-transparent">`;
       break;
 
     case "callout":
       const callout = (block as any).callout;
       const icon = callout?.icon?.emoji || "💡"; // Default icon
-      html = `<div class="my-6 p-4 border rounded-md flex items-start space-x-3 bg-blue-50/50 border-blue-200 dark:bg-gray-800/60 dark:border-blue-800/30 shadow-sm hover:shadow transition-shadow duration-200">
+      html = `<div class="my-6 p-4 border rounded-md flex items-start space-x-3 bg-red-50 border-red-200 dark:bg-gray-800 dark:border-red-400 shadow-sm hover:shadow transition-shadow duration-200">
              <span class="text-xl select-none">${icon}</span>
              <div class="text-primary">${renderRichText(
                callout?.rich_text
@@ -382,15 +384,15 @@ async function renderNonListBlock(
         .map((res) => res.html)
         .join("");
       const summary = renderRichText((block as any).toggle?.rich_text);
-      html = `<details class="my-6 p-4 border rounded-md bg-gray-50/70 dark:bg-gray-700/50 dark:border-gray-600 shadow-sm hover:shadow transition-shadow duration-200">
-                    <summary class="cursor-pointer font-medium text-primary hover:text-primary/80 transition-colors duration-150">${summary}</summary>
-                    <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600 text-primary">${toggleContent}</div>
+      html = `<details class="my-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 shadow-sm hover:shadow transition-shadow duration-200">
+                    <summary class="cursor-pointer font-medium text-primary hover:text-red-500 transition-colors duration-150">${summary}</summary>
+                    <div class="mt-4 pt-3 border-t border-red-400 dark:border-red-400 text-primary">${toggleContent}</div>
                 </details>`;
       break;
 
     case "child_page":
       html = `<div class="my-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700 hover:shadow-md transition-shadow duration-200 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <p class="font-medium text-primary">${
