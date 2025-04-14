@@ -5,8 +5,11 @@ import { getNotionPosts } from "../../lib/api/notion.ts";
 const posts = await getNotionPosts();
 const currentPath = Astro.url.pathname;
 
+// デバッグ情報
+console.log("CategoryButton - Current Path:", currentPath);
+
 // トップページではコンポーネントを表示しない
-if (currentPath === "/") return null;
+if (currentPath === "/" || currentPath === "") return null;
 
 // カテゴリ一覧を取得（重複排除）
 const allTags = posts.flatMap((post) => {
@@ -21,6 +24,31 @@ const uniqueTags = [...new Set(allTags)].filter(Boolean);
 if (uniqueTags.length === 0) {
   uniqueTags.push("CSS", "HTML");
 }
+
+// パスが特定のパターンで始まるかチェックする関数
+function pathStartsWith(path: string, pattern: string): boolean {
+  // 正規化: 末尾のスラッシュを削除
+  const normalizedPath = path.endsWith("/") ? path.slice(0, -1) : path;
+  return normalizedPath === pattern || normalizedPath.startsWith(pattern + "/");
+}
+
+// タグパスが現在のパスに含まれているかチェックする関数
+function isTagActive(currentPath: string, tagName: string): boolean {
+  const encodedTag = encodeURIComponent(tagName);
+  const tagPattern = `/tags/${encodedTag}`;
+
+  // デバッグ用
+  console.log(
+    `Checking tag: ${tagName}, pattern: ${tagPattern}, current: ${currentPath}`
+  );
+
+  return currentPath.includes(tagPattern);
+}
+
+// 記事一覧ページかチェックする関数
+function isAllActive(currentPath: string): boolean {
+  return pathStartsWith(currentPath, "/blog/page");
+}
 ---
 
 <div class="w-fit mx-auto text-center">
@@ -30,21 +58,23 @@ if (uniqueTags.length === 0) {
       (() => {
         const allUrl = "/blog/page/1";
         // 記事一覧ページの場合のみALLをアクティブに
-        const isAllActive = currentPath.startsWith("/blog/page");
+        const isActive = isAllActive(currentPath);
+
+        console.log("ALL button active:", isActive);
 
         return (
           <li class="relative group">
             <a
               href={allUrl}
               class={`px-5 py-2 font-medium transition-colors text-primary ${
-                isAllActive ? "pointer-events-none" : "group-hover:text-primary"
+                isActive ? "pointer-events-none" : "group-hover:text-primary"
               }`}
             >
               ALL
             </a>
             <span
               class={`absolute left-0 -bottom-0.5 w-full h-0.5 transition-transform duration-300 ${
-                isAllActive
+                isActive
                   ? "bg-red-400"
                   : "bg-red-400 scale-x-0 group-hover:scale-x-100 origin-left"
               }`}
@@ -59,9 +89,7 @@ if (uniqueTags.length === 0) {
         // 既存のファイル構造に合わせてURLを構築
         const tagUrl = `/tags/${encodeURIComponent(tag)}`;
         // 本番環境でも正しく動作するように修正
-        const isActive = currentPath.includes(
-          `/tags/${encodeURIComponent(tag)}`
-        );
+        const isActive = isTagActive(currentPath, tag);
 
         return (
           <li class="relative group">
