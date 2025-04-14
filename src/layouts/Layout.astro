@@ -8,8 +8,6 @@ import CategoryButton from "../components/ui/CategoryButton.astro";
 const meta = getMeta(Astro.url.pathname);
 
 const title = Astro.props.title ?? meta.title;
-const description = Astro.props.description ?? meta.description;
-const keywords = Astro.props.keywords ?? meta.keywords;
 
 // 記事詳細ページかどうか（例: /test-article のような1階層のみ）
 const isArticlePage =
