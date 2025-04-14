@@ -69,25 +69,19 @@ function renderListItems(): string {
 // Helper function to generate slugs (Exported) - Updated for non-latin chars
 export function slugify(text: string): string {
   if (!text) return "";
-  // Keep the original text for non-empty slugs if it's simple enough, otherwise encode.
-  // Simple check: alphanumeric, hyphen, underscore.
-  // If it contains other characters (like Japanese), URL encode it.
-  // Also, convert simple ASCII text to lowercase for consistency.
-  const simplifiedText = text.trim(); // Trim whitespace first
-  if (/^[a-zA-Z0-9-_]+$/.test(simplifiedText)) {
-    // If the text is already simple (ASCII alphanumeric, hyphen, underscore), use it directly after lowercasing.
-    // This keeps simple slugs like "section-1" readable.
-    return simplifiedText.toLowerCase();
-  } else {
-    // For text containing spaces, special characters, or non-latin characters,
-    // 1. Replace spaces with hyphens first for better readability before encoding.
-    // 2. URL encode the entire string to handle all other characters safely.
-    const spacedHyphened = simplifiedText.replace(/\s+/g, "-");
-    return encodeURIComponent(spacedHyphened);
-    // Example: "主要技術 の 進化" -> "主要技術-の-進化" -> "%E4%B8%BB%E8%A6%81%E6%8A%80%E8%A1%93-%E3%81%AE-%E9%80%B2%E5%8C%96"
+
+  // 単純な数値IDを生成
+  // テキストのハッシュ値を計算して数値に変換
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
   }
-  // Note: This approach might generate long IDs for Japanese text.
-  // Consider libraries like github-slugger for more sophisticated slug generation if needed.
+  // 正の数値にする
+  hash = Math.abs(hash);
+  // 適度な長さに調整
+  return hash.toString().substring(0, 8);
 }
 
 // リッチテキストの処理（安全なバージョン） - プレーンテキスト取得ロジックを修正
@@ -108,7 +102,9 @@ function renderRichText(richTextArr: any[] = []): string {
       if (richText.annotations?.strikethrough) result = `<del>${result}</del>`;
       if (richText.annotations?.underline) result = `<u>${result}</u>`;
       if (richText.annotations?.code)
-        result = `<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-primary">${result}</code>`; // Style update
+        result = `<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-primary">${result
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</code>`; // エスケープを追加
 
       // リンク
       if (richText.href) {
@@ -299,7 +295,7 @@ async function renderNonListBlock(
 
     case "code":
       codeBlockCounter++;
-      const codeId = `code-block-${codeBlockCounter}`;
+      const codeId = `${codeBlockCounter}`; // IDを数字のみにシンプル化
       const codeContent = renderRichText((block as any).code?.rich_text)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -313,6 +309,7 @@ async function renderNonListBlock(
           <div class="flex justify-between items-center px-4 py-2 bg-gray-900 text-gray-300 border-b border-gray-700">
             <span class="text-xs font-mono">${language}</span>
             <button
+              id="copy-btn-${codeId}"
               class="copy-button bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded transition-colors duration-200"
               onclick="copyCode('${codeId}')"
               aria-label="コードをコピー"
@@ -323,12 +320,16 @@ async function renderNonListBlock(
           <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="language-${language} hljs text-gray-100">${codeContent}</code></pre>
         </div>
         <script>
-          function copyCode(id) {
-            const codeElement = document.getElementById(id);
+          if (typeof window.codeCopyHandlers === 'undefined') {
+            window.codeCopyHandlers = {};
+          }
+          
+          window.codeCopyHandlers['${codeId}'] = function() {
+            const codeElement = document.getElementById('${codeId}');
             if (codeElement) {
               const text = codeElement.textContent || codeElement.innerText;
               navigator.clipboard.writeText(text).then(() => {
-                const button = document.querySelector(\`button[onclick="copyCode('${codeId}')"]\`);
+                const button = document.getElementById('copy-btn-${codeId}');
                 if (button) {
                   button.textContent = 'コピーしました！';
                   setTimeout(() => {
@@ -340,6 +341,13 @@ async function renderNonListBlock(
               });
             }
           }
+          
+          function copyCode(id) {
+            if (window.codeCopyHandlers && window.codeCopyHandlers[id]) {
+              window.codeCopyHandlers[id]();
+            }
+          }
+          
           document.addEventListener('DOMContentLoaded', () => {
             if (typeof hljs !== 'undefined') {
               const codeBlock = document.getElementById('${codeId}');
