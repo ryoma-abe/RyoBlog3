@@ -300,7 +300,12 @@ async function renderNonListBlock(
     case "code":
       codeBlockCounter++;
       const codeId = `code-block-${codeBlockCounter}`;
-      const codeContent = renderRichText((block as any).code?.rich_text);
+      const codeContent = renderRichText((block as any).code?.rich_text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
       const language = (block as any).code?.language || "plaintext";
 
       html = `
@@ -309,14 +314,41 @@ async function renderNonListBlock(
             <span class="text-xs font-mono">${language}</span>
             <button
               class="copy-button bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded transition-colors duration-200"
-              data-target="${codeId}"
-              onclick="copyCodeToClipboard('${codeId}')"
+              onclick="copyCode('${codeId}')"
+              aria-label="コードをコピー"
             >
               コピー
             </button>
           </div>
-          <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="text-gray-100 language-${language}">${codeContent}</code></pre>
+          <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="language-${language} hljs text-gray-100">${codeContent}</code></pre>
         </div>
+        <script>
+          function copyCode(id) {
+            const codeElement = document.getElementById(id);
+            if (codeElement) {
+              const text = codeElement.textContent || codeElement.innerText;
+              navigator.clipboard.writeText(text).then(() => {
+                const button = document.querySelector(\`button[onclick="copyCode('${codeId}')"]\`);
+                if (button) {
+                  button.textContent = 'コピーしました！';
+                  setTimeout(() => {
+                    button.textContent = 'コピー';
+                  }, 2000);
+                }
+              }).catch(err => {
+                console.error('コピーに失敗しました:', err);
+              });
+            }
+          }
+          document.addEventListener('DOMContentLoaded', () => {
+            if (typeof hljs !== 'undefined') {
+              const codeBlock = document.getElementById('${codeId}');
+              if (codeBlock) {
+                hljs.highlightElement(codeBlock);
+              }
+            }
+          });
+        </script>
       `;
       break;
 
