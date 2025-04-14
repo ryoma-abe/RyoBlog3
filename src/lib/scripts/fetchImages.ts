@@ -1,8 +1,10 @@
 import fs from "fs";
 import path from "path";
-import fetch from "node-fetch";
 import sharp from "sharp";
 import { getNotionPosts, getNotionBlocks } from "../api/notion";
+
+// Node.js 組み込みの fetch を使う（Node 18+）
+const fetch = globalThis.fetch;
 
 const outputDir = path.resolve("public/images/notion");
 
@@ -14,7 +16,7 @@ async function downloadAndConvertToWebP(url: string, filename: string) {
       return;
     }
 
-    const buffer = await res.buffer();
+    const buffer = Buffer.from(await res.arrayBuffer());
     const outPath = path.join(outputDir, `${filename}.webp`);
 
     await sharp(buffer).webp().toFile(outPath);
