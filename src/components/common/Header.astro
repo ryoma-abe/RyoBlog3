@@ -17,6 +17,9 @@ const isBlogRelated =
   (currentPath.length > 1 &&
     !currentPath.startsWith("/about") &&
     !currentPath.startsWith("/contact") &&
+    !currentPath.startsWith("/sitemap") &&
+    !currentPath.startsWith("/404") &&
+    !currentPath.startsWith("/privacy-policy") &&
     !currentPath.startsWith("/thanks"));
 ---
 
