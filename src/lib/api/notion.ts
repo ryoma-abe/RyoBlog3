@@ -336,10 +336,12 @@ async function renderNonListBlock(
         image?.type === "external" ? image.external.url : image?.file?.url;
       const caption = renderRichText(image?.caption);
       if (imageUrl) {
+        // Astroの画像最適化のためのマークアップを生成
+        // data-astro-imageで画像ソースを指定し、JavaScriptで置き換えられるようにする
         html = `<figure class="my-8">
                 <img src="${imageUrl}" alt="${
           caption || "Image from Notion"
-        }" class="max-w-full h-auto mx-auto rounded-md shadow-md">
+        }" class="max-w-full h-auto mx-auto rounded-md shadow-md" data-astro-image="true" loading="lazy">
                 ${
                   caption
                     ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`

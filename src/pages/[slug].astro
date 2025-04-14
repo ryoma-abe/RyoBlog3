@@ -199,3 +199,54 @@ const relatedPosts = allPosts
     )
   }
 </Layout>
+
+<script>
+  // 画像最適化ユーティリティをインポート
+  import { optimizeNotionImageUrl } from "../lib/utils/imageService";
+
+  // Notionの画像を検出して最適化する
+  document.addEventListener("DOMContentLoaded", () => {
+    // data-astro-image属性を持つ画像を探す
+    const notionImages = document.querySelectorAll(
+      'img[data-astro-image="true"]'
+    );
+
+    // 各画像を処理
+    notionImages.forEach((img) => {
+      const src = img.getAttribute("src");
+      if (src) {
+        try {
+          // レスポンシブ対応のため、画面サイズに応じた幅を指定
+          const viewportWidth = Math.min(window.innerWidth, 1200);
+          const optimizedWidth = Math.min(viewportWidth, 800);
+
+          // 最適化されたURLを生成して適用
+          const optimizedUrl = optimizeNotionImageUrl(src, optimizedWidth);
+          img.setAttribute("src", optimizedUrl);
+
+          // 遅延読み込みのためのdecoding属性を追加
+          img.setAttribute("decoding", "async");
+
+          // 画像読み込み完了時にクラスを追加してフェードイン効果
+          img.addEventListener("load", () => {
+            img.classList.add("loaded");
+          });
+        } catch (e) {
+          console.warn("画像最適化エラー:", e);
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  /* 画像のフェードイン効果 */
+  img[data-astro-image="true"] {
+    opacity: 0.6;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  img[data-astro-image="true"].loaded {
+    opacity: 1;
+  }
+</style>
