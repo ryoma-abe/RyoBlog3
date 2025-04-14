@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 /* 基本的なカラー変数（ライトモード） */
 :root {
   --color-primary-bg: #f4f3f3;
