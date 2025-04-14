@@ -336,24 +336,16 @@ async function renderNonListBlock(
         image?.type === "external" ? image.external.url : image?.file?.url;
       const caption = renderRichText(image?.caption);
       if (imageUrl) {
-        // クライアント側でAstroコンポーネントをレンダリングするためのマークアップ
-        html = `<div class="notion-image-container" 
-                   data-astro-optimized-image="true"
-                   data-src="${imageUrl}" 
-                   data-alt="${caption || "Image from Notion"}"
-                   data-caption="${caption || ""}"
-                >
-                  <img src="${imageUrl}" 
-                       alt="${caption || "Image from Notion"}" 
-                       class="max-w-full h-auto mx-auto rounded-md shadow-md"
-                       loading="lazy"
-                  />
-                  ${
-                    caption
-                      ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`
-                      : ""
-                  }
-                </div>`;
+        html = `<figure class="my-8">
+                <img src="${imageUrl}" alt="${
+          caption || "Image from Notion"
+        }" class="max-w-full h-auto mx-auto rounded-md shadow-md">
+                ${
+                  caption
+                    ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`
+                    : ""
+                }
+             </figure>`;
       }
       break;
 
