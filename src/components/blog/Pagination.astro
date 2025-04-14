@@ -16,7 +16,7 @@ const { currentPage, totalPages, baseUrl } = Astro.props;
           href={`${baseUrl}${i === 0 ? "" : `/${i + 1}`}`}
           class={`px-4 py-2 rounded ${
             i + 1 === currentPage
-              ? "bg-blue-500 text-white"
+              ? "bg-blue-400 text-white"
               : "bg-gray-700 text-white"
           }`}
         >
