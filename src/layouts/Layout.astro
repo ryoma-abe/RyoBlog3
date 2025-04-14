@@ -75,15 +75,18 @@ const isArticlePage =
     <main>
       <div class="container mx-auto pt-10 pb-20 px-5">
         {
-          !isArticlePage && (
+          !isArticlePage ? (
             <h1 class="text-4xl font-bold text-center">{title}</h1>
-          )
+          ) : null
         }
+
         {
           title !== "送信完了" &&
-            title !== "お問い合わせ" &&
-            title !== "About" &&
-            !isArticlePage && <CategoryButton />
+          title !== "お問い合わせ" &&
+          title !== "About" &&
+          !isArticlePage ? (
+            <CategoryButton />
+          ) : null
         }
         <slot />
       </div>
