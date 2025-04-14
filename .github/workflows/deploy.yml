@@ -9,10 +9,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

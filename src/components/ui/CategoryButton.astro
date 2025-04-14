@@ -1,8 +1,8 @@
 ---
-import { getNotionPosts } from "../../lib/api/notion.ts";
+import { getCollection } from "astro:content";
 
-// Notionからの投稿を取得
-const posts = await getNotionPosts();
+// コンテンツコレクションから投稿を取得
+const posts = await getCollection("blog");
 const currentPath = Astro.url.pathname;
 
 // デバッグ情報
@@ -12,10 +12,7 @@ console.log("CategoryButton - Current Path:", currentPath);
 if (currentPath === "/" || currentPath === "") return null;
 
 // カテゴリ一覧を取得（重複排除）
-const allTags = posts.flatMap((post) => {
-  const tags = (post.properties.Tags as any)?.multi_select || [];
-  return tags.map((tag: { name: string }) => tag.name);
-});
+const allTags = posts.flatMap((post) => post.data.tags || []);
 
 // 重複を排除したタグリスト
 const uniqueTags = [...new Set(allTags)].filter(Boolean);

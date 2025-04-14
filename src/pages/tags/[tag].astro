@@ -3,16 +3,13 @@
 
 import Layout from "../../layouts/Layout.astro";
 import BlogArea from "../../components/blog/BlogArea.astro";
-import { getNotionPosts } from "../../lib/api/notion";
+import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
-  const allPosts = await getNotionPosts();
+  const allPosts = await getCollection("blog");
 
   // すべてのタグを抽出
-  const allTags = allPosts.flatMap((post) => {
-    const tags = (post.properties.Tags as any)?.multi_select || [];
-    return tags.map((tag: { name: string }) => tag.name);
-  });
+  const allTags = allPosts.flatMap((post) => post.data.tags || []);
 
   // 重複を削除
   const uniqueTags = [...new Set(allTags)].filter(Boolean);
@@ -25,8 +22,7 @@ export async function getStaticPaths() {
   return uniqueTags.map((tag) => {
     // そのタグを持つ投稿をフィルタリング
     const filteredPosts = allPosts.filter((post) => {
-      const postTags = (post.properties.Tags as any)?.multi_select || [];
-      return postTags.some((t: { name: string }) => t.name === tag);
+      return post.data.tags && post.data.tags.includes(tag);
     });
 
     return {
