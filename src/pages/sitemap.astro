@@ -1,0 +1,101 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getNotionPosts } from "../lib/api/notion";
+import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+
+// 全記事データを取得
+const articles = await getNotionPosts();
+
+// 記事情報をパスごとに整理
+const pages = [
+  { url: "/", title: "トップページ" },
+  { url: "/about", title: "About" },
+  { url: "/contact", title: "お問い合わせ" },
+  { url: "/blog", title: "ブログ一覧" },
+  { url: "/privacy-policy", title: "プライバシーポリシー" },
+  { url: "/sitemap", title: "サイトマップ" },
+];
+
+// ブログ記事をサイトマップに追加
+const blogPages = articles.map((article: PageObjectResponse) => {
+  const title =
+    (article.properties.title as any)?.title?.[0]?.plain_text || "無題";
+  const slug =
+    (article.properties.slug as any)?.rich_text?.[0]?.plain_text || "no-slug";
+
+  return {
+    url: `/${slug}`,
+    title: title,
+  };
+});
+
+// タグページ
+const allTags: string[] = [];
+articles.forEach((article: PageObjectResponse) => {
+  const tags = (article.properties.Tags as any)?.multi_select || [];
+  tags.forEach((tag: { name: string }) => {
+    if (tag.name && !allTags.includes(tag.name)) {
+      allTags.push(tag.name);
+    }
+  });
+});
+
+const tagPages = allTags.map((tag: string) => {
+  return {
+    url: `/tags/${tag}`,
+    title: `${tag}の記事一覧`,
+  };
+});
+
+// すべてのページを結合
+const allPages = [...pages, ...blogPages, ...tagPages];
+---
+
+<Layout title="サイトマップ">
+  <div class="max-w-3xl mx-auto mt-10">
+    <div class="prose dark:prose-invert max-w-none">
+      <p class="text-lg mb-8">
+        当サイト内のページ一覧です。お探しのページが見つからない場合はこちらをご利用ください。
+      </p>
+
+      <h2 class="text-2xl font-bold mt-8 mb-4">メインページ</h2>
+      <ul class="space-y-2">
+        {
+          pages.map((page) => (
+            <li>
+              <a href={page.url} class="hover:underline">
+                {page.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2 class="text-2xl font-bold mt-8 mb-4">ブログ記事</h2>
+      <ul class="space-y-2">
+        {
+          blogPages.map((page) => (
+            <li>
+              <a href={page.url} class="hover:underline">
+                {page.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2 class="text-2xl font-bold mt-8 mb-4">タグ一覧</h2>
+      <ul class="space-y-2">
+        {
+          tagPages.map((page) => (
+            <li>
+              <a href={page.url} class="hover:underline">
+                {page.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</Layout>
