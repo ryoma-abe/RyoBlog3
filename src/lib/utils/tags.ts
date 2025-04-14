@@ -30,7 +30,7 @@ export async function getTagCounts() {
 export const tagColors: Record<string, string> = {
   HTML: "bg-orange-600",
   CSS: "bg-blue-600",
-  JavaScript: "bg-yellow-600",
+  JavaScript: "bg-yellow-700",
   React: "bg-cyan-600",
   Astro: "bg-purple-600",
   AI: "bg-pink-600",
