@@ -217,7 +217,26 @@ async function renderNonListBlock(
   switch (type) {
     case "paragraph":
       const paragraphText = renderRichText((block as any).paragraph?.rich_text);
-      if (paragraphText.trim()) {
+      const codePenMatch = paragraphText.match(
+        /https:\/\/codepen\.io\/[^\s"<>]+/
+      );
+
+      if (codePenMatch) {
+        // CodePenのURLを検出して埋め込みに変換
+        const codePenUrl = codePenMatch[0];
+        const codePenEmbed = codePenUrl.replace("/pen/", "/embed/");
+        html = `<div class="codepen-wrapper my-8 rounded-md overflow-hidden shadow-md">
+                  <iframe 
+                    height="400" 
+                    style="width: 100%;" 
+                    scrolling="no" 
+                    src="${codePenEmbed}?height=400&theme-id=dark&default-tab=result" 
+                    frameborder="no" 
+                    loading="lazy"
+                    allowfullscreen="true">
+                  </iframe>
+                </div>`;
+      } else if (paragraphText.trim()) {
         html = `<p class="my-6 leading-relaxed text-primary dark:text-primary/90 hover:text-primary/100 dark:hover:text-primary transition-colors duration-200">${paragraphText}</p>`;
       } else {
         html = `<div class="h-4"></div>`; // 空の段落は小さいスペースとして表示
@@ -399,6 +418,36 @@ async function renderNonListBlock(
                   (block as any).child_page?.title || "Untitled"
                 }</p>
               </div>`;
+      break;
+
+    case "embed":
+      const embedUrl = (block as any).embed?.url;
+      if (embedUrl && embedUrl.includes("codepen.io")) {
+        // CodePenのURLを埋め込み用に変換
+        const codePenSrc = embedUrl.replace("/pen/", "/embed/");
+        html = `<div class="codepen-wrapper my-8 rounded-md overflow-hidden shadow-md">
+                  <iframe 
+                    height="400" 
+                    style="width: 100%;" 
+                    scrolling="no" 
+                    src="${codePenSrc}?height=400&theme-id=dark&default-tab=result" 
+                    frameborder="no" 
+                    loading="lazy"
+                    allowfullscreen="true">
+                  </iframe>
+                </div>`;
+      } else {
+        html = `<div class="embed-container my-8 rounded-md overflow-hidden shadow-md">
+                  <iframe 
+                    src="${embedUrl}" 
+                    style="width: 100%;" 
+                    height="400" 
+                    frameborder="0" 
+                    allowfullscreen="true"
+                    loading="lazy">
+                  </iframe>
+                </div>`;
+      }
       break;
 
     case "unsupported":

@@ -34,6 +34,9 @@ export const tagColors: Record<string, string> = {
   React: "bg-cyan-600",
   Astro: "bg-purple-600",
   AI: "bg-pink-600",
+  Shopify: "bg-green-600",
+  コラム: "bg-indigo-600",
+  開発環境: "bg-indigo-600",
   その他: "bg-gray-600", // fallback
 };
 
