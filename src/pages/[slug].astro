@@ -1,201 +1,75 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import {
-  getNotionPosts,
-  getNotionBlocks,
-  renderBlock,
-  finalizeRenderedContent,
-} from "../lib/api/notion";
-import type {
-  PageObjectResponse,
-  BlockObjectResponse,
-} from "@notionhq/client/build/src/api-endpoints";
-import type { HeadingInfo } from "../lib/api/notion";
-import LinkButton from "../components/ui/LinkButton.astro";
+import { formatDate } from "../lib/utils/utils";
+import { getTagColor } from "../lib/utils/tags";
 
+// 1. 生成するページのパスを定義
 export async function getStaticPaths() {
-  const posts = await getNotionPosts();
+  const blogEntries = await getCollection("blog");
 
-  return posts.map((post: PageObjectResponse) => {
-    const slug =
-      (post.properties.slug as any)?.rich_text?.[0]?.plain_text || "no-slug";
-
-    return {
-      params: { slug },
-      props: { post, allPosts: posts },
-    };
-  });
+  return blogEntries.map((entry) => ({
+    params: {
+      // ファイル名をスラッグとして使用（blog/post-1.md → post-1）
+      slug: entry.id
+        .replace("blog/", "")
+        .replace(".md", "")
+        .replace(".mdx", ""),
+    },
+    props: { entry },
+  }));
 }
 
-const { post, allPosts } = Astro.props;
+// 2. このページテンプレートでは、propsから渡されたentryが使用できます
+const { entry } = Astro.props;
+const { Content } = await entry.render();
 
-const title = (post.properties.title as any)?.title?.[0]?.plain_text || "無題";
-const tags = (post.properties.Tags as any)?.multi_select || [];
-const date = (post.properties.date as any)?.date?.start || "";
-const currentSlug =
-  (post.properties.slug as any)?.rich_text?.[0]?.plain_text || "no-slug";
-
-const currentTags = tags.map((tag: { name: string }) => tag.name);
-const metaTitle = `${title} | RyoBlog`;
-const metaDescription = `この記事では「${title}」について解説しています。`;
-
-const blocks = await getNotionBlocks(post.id);
-
-const renderResults = await Promise.all(
-  blocks.map((block: BlockObjectResponse) => renderBlock(block))
-);
-
-const { html: content, headings } = finalizeRenderedContent(renderResults);
-
-const showToc = headings && headings.length > 1;
-
-const relatedPosts = allPosts
-  .filter((p: PageObjectResponse) => {
-    const pSlug =
-      (p.properties.slug as any)?.rich_text?.[0]?.plain_text || "no-slug";
-    if (pSlug === currentSlug) return false;
-
-    const pTags =
-      (p.properties.Tags as any)?.multi_select?.map(
-        (tag: { name: string }) => tag.name
-      ) || [];
-    return pTags.some((tag: string) => currentTags.includes(tag));
-  })
-  .sort((a: PageObjectResponse, b: PageObjectResponse) => {
-    const dateA = new Date((a.properties.date as any)?.date?.start || 0);
-    const dateB = new Date((b.properties.date as any)?.date?.start || 0);
-    return dateB.getTime() - dateA.getTime();
-  })
-  .slice(0, 2);
+// デバッグ用
+console.log(`記事スラッグ: ${Astro.params.slug}`);
+console.log(`記事ID: ${entry.id}`);
 ---
 
-<Layout title={metaTitle} description={metaDescription} keywords={currentTags}>
-  <article class="max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
-
-    <div class="flex flex-wrap gap-2 mb-4">
-      {
-        tags.map((tag: { name: string }) => (
-          <span class="text-sm px-3 py-1 rounded-full border border-primary text-primary dark:border-primary-dark dark:text-primary-dark whitespace-nowrap">
-            {tag.name}
-          </span>
-        ))
-      }
-    </div>
-
-    <time class="text-primary text-sm mb-8 block">{date}</time>
-
-    {
-      showToc && (
-        <details
-          class="toc-container bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-10 p-4 group"
-          open
-        >
-          <summary class="cursor-pointer font-semibold text-lg text-gray-800 dark:text-gray-200 list-none flex justify-between items-center">
-            <span>目次</span>
-            <svg
-              class="w-5 h-5 transition-transform duration-200 group-open:rotate-180"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-              />
-            </svg>
-          </summary>
-          <nav class="mt-3">
-            <ul class="space-y-1.5">
-              {headings.map((heading: HeadingInfo) => (
-                <li class={`toc-item toc-level-${heading.level}`}>
-                  <a
-                    href={`#${heading.slug}`}
-                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-dark transition-colors duration-150"
-                    style={{ marginLeft: `${(heading.level - 1) * 1.2}rem` }}
-                  >
-                    {heading.text}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </details>
-      )
-    }
-
-    <div
-      class="prose prose-lg dark:prose-invert max-w-none mt-8"
-      set:html={content}
-    />
-
-    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-      <LinkButton href="/blog/page"> &larr; 一覧へ戻る </LinkButton>
-    </div>
-  </article>
-
-  {
-    relatedPosts.length > 0 && (
-      <section class="related-posts max-w-4xl mx-auto px-4 py-8 mt-12 border-t border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold mb-6">関連記事</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {relatedPosts.map((relatedPost: PageObjectResponse) => {
-            const relatedTitle =
-              (relatedPost.properties.title as any)?.title?.[0]?.plain_text ||
-              "無題";
-            const relatedSlug =
-              (relatedPost.properties.slug as any)?.rich_text?.[0]
-                ?.plain_text || "no-slug";
-            const relatedDate =
-              (relatedPost.properties.date as any)?.date?.start || "";
-            const relatedTags =
-              (relatedPost.properties.Tags as any)?.multi_select || [];
-
-            let formattedDate = "";
-            if (relatedDate) {
-              try {
-                formattedDate = new Date(relatedDate).toLocaleDateString(
-                  "ja-JP",
-                  {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  }
-                );
-              } catch (e) {
-                console.error("日付のフォーマットに失敗:", relatedDate, e);
-                formattedDate = relatedDate;
-              }
+<Layout title={entry.data.title}>
+  <main class="container mx-auto px-4 py-8 max-w-4xl">
+    <article class="prose dark:prose-invert lg:prose-lg mx-auto">
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-2">{entry.data.title}</h1>
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex gap-2 flex-wrap">
+            {
+              entry.data.tags.map((tag) => (
+                <span
+                  class={`text-sm px-3 py-1 rounded-full ${getTagColor(tag)} text-white`}
+                >
+                  {tag}
+                </span>
+              ))
             }
-
-            return (
-              <a
-                href={`/${relatedSlug}`}
-                class="block p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow duration-200 dark:hover:bg-gray-800"
-              >
-                <h3 class="text-lg font-semibold mb-2 line-clamp-2">
-                  {relatedTitle}
-                </h3>
-                {formattedDate && (
-                  <time class="text-sm text-gray-500 dark:text-gray-400 block mb-2">
-                    {formattedDate}
-                  </time>
-                )}
-                <div class="flex flex-wrap gap-1 mt-auto pt-2">
-                  {relatedTags.map((tag: { name: string }) => (
-                    <span class="text-xs px-2 py-0.5 rounded-full border border-primary/50 text-primary/80 dark:border-primary-dark/50 dark:text-primary-dark/80 whitespace-nowrap">
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              </a>
-            );
-          })}
+          </div>
+          <time class="text-gray-500">
+            {
+              formatDate(
+                entry.data.date instanceof Date
+                  ? entry.data.date.toISOString()
+                  : String(entry.data.date)
+              )
+            }
+          </time>
         </div>
-      </section>
-    )
-  }
+        {
+          entry.data.description && (
+            <p class="text-xl text-gray-600 mt-4">{entry.data.description}</p>
+          )
+        }
+      </div>
+
+      <div class="markdown-content">
+        <Content />
+      </div>
+
+      <div class="mt-12 pt-6 border-t">
+        <a href="/" class="text-blue-500 hover:underline">← 記事一覧に戻る</a>
+      </div>
+    </article>
+  </main>
 </Layout>

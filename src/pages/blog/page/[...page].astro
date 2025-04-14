@@ -2,11 +2,13 @@
 import Layout from "../../../layouts/Layout.astro";
 import BlogArea from "../../../components/blog/BlogArea.astro";
 import Pagination from "../../../components/blog/Pagination.astro";
-import { getNotionPosts } from "../../../lib/api/notion.ts";
+import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
   const POSTS_PER_PAGE = 12;
-  const allPosts = await getNotionPosts();
+  const allPosts = await getCollection("blog", ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
   const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 
   const paths = Array.from({ length: totalPages }, (_, i) => ({
@@ -16,7 +18,9 @@ export async function getStaticPaths() {
 }
 
 const POSTS_PER_PAGE = 12;
-const allPosts = await getNotionPosts();
+const allPosts = await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
 const pageParam = Astro.params.page;
 const currentPage = pageParam ? parseInt(pageParam) : 1;
 const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
