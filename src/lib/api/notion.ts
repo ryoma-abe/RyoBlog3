@@ -216,10 +216,13 @@ async function renderNonListBlock(
 
   switch (type) {
     case "paragraph":
-      html = `<p class="my-6 leading-relaxed">${renderRichText(
-        (block as any).paragraph?.rich_text
-      )}</p>`;
-      break; // break を追加
+      const paragraphText = renderRichText((block as any).paragraph?.rich_text);
+      if (paragraphText.trim()) {
+        html = `<p class="my-6 leading-relaxed text-primary dark:text-primary/90 hover:text-primary/100 dark:hover:text-primary transition-colors duration-200">${paragraphText}</p>`;
+      } else {
+        html = `<div class="h-4"></div>`; // 空の段落は小さいスペースとして表示
+      }
+      break;
 
     case "heading_1":
       const h1RichText = (block as any).heading_1?.rich_text;
@@ -227,55 +230,54 @@ async function renderNonListBlock(
       const h1Slug = slugify(h1Text);
       if (h1Text && h1Slug) {
         // テキストとスラッグがある場合のみ
-        html = `<h1 id="${h1Slug}" class="text-3xl font-bold mt-10 mb-6">${renderRichText(
+        html = `<h1 id="${h1Slug}" class="text-3xl font-bold mt-10 mb-6 pb-2 border-b-2 border-primary/30 dark:border-primary/20">${renderRichText(
           h1RichText
-        )}</h1>`; // scroll-mt-20 を削除
+        )}</h1>`;
         headingInfo = { level: 1, text: h1Text, slug: h1Slug };
       } else {
-        html = `<h1 class="text-3xl font-bold mt-10 mb-6">${renderRichText(
+        html = `<h1 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b-2 border-primary/30 dark:border-primary/20">${renderRichText(
           h1RichText
-        )}</h1>`; // Fallback if text is empty
+        )}</h1>`;
       }
-      break; // break を追加
+      break;
 
     case "heading_2":
       const h2RichText = (block as any).heading_2?.rich_text;
       const h2Text = getPlainText(h2RichText);
       const h2Slug = slugify(h2Text);
       if (h2Text && h2Slug) {
-        html = `<h2 id="${h2Slug}" class="text-2xl font-bold mt-8 mb-4">${renderRichText(
+        html = `<h2 id="${h2Slug}" class="text-2xl font-bold mt-8 mb-4 pb-1 border-b border-primary/20 dark:border-primary/10">${renderRichText(
           h2RichText
-        )}</h2>`; // scroll-mt-20 を削除
+        )}</h2>`;
         headingInfo = { level: 2, text: h2Text, slug: h2Slug };
       } else {
-        html = `<h2 class="text-2xl font-bold mt-8 mb-4">${renderRichText(
+        html = `<h2 class="text-2xl font-bold mt-8 mb-4 pb-1 border-b border-primary/20 dark:border-primary/10">${renderRichText(
           h2RichText
         )}</h2>`;
       }
-      break; // break を追加
+      break;
 
     case "heading_3":
       const h3RichText = (block as any).heading_3?.rich_text;
       const h3Text = getPlainText(h3RichText);
       const h3Slug = slugify(h3Text);
       if (h3Text && h3Slug) {
-        html = `<h3 id="${h3Slug}" class="text-xl font-bold mt-6 mb-3">${renderRichText(
+        html = `<h3 id="${h3Slug}" class="text-xl font-bold mt-6 mb-3 pl-2 border-l-4 border-primary/30 dark:border-primary/20">${renderRichText(
           h3RichText
-        )}</h3>`; // scroll-mt-20 を削除
+        )}</h3>`;
         headingInfo = { level: 3, text: h3Text, slug: h3Slug };
       } else {
-        html = `<h3 class="text-xl font-bold mt-6 mb-3">${renderRichText(
+        html = `<h3 class="text-xl font-bold mt-6 mb-3 pl-2 border-l-4 border-primary/30 dark:border-primary/20">${renderRichText(
           h3RichText
         )}</h3>`;
       }
-      break; // break を追加
+      break;
 
     case "quote":
-      html = `<blockquote class="border-l-4 pl-4 my-8">${renderRichText(
-        // Style update
+      html = `<blockquote class="border-l-4 border-primary/50 dark:border-primary/30 pl-4 py-2 my-8 bg-gray-50 dark:bg-gray-800 rounded-r-md italic">${renderRichText(
         (block as any).quote?.rich_text
       )}</blockquote>`;
-      break; // break を追加
+      break;
 
     case "code":
       codeBlockCounter++;
@@ -284,8 +286,8 @@ async function renderNonListBlock(
       const language = (block as any).code?.language || "plaintext";
 
       html = `
-        <div class="code-block-container relative my-8 bg-gray-800 rounded-md overflow-hidden">
-          <div class="flex justify-between items-center px-4 py-2 bg-gray-900 text-gray-300">
+        <div class="code-block-container relative my-8 bg-gray-800 rounded-md overflow-hidden shadow-md">
+          <div class="flex justify-between items-center px-4 py-2 bg-gray-900 text-gray-300 border-b border-gray-700">
             <span class="text-xs font-mono">${language}</span>
             <button
               class="copy-button bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded transition-colors duration-200"
@@ -298,7 +300,7 @@ async function renderNonListBlock(
           <pre class="p-4 overflow-auto text-sm"><code id="${codeId}" class="text-gray-100 language-${language}">${codeContent}</code></pre>
         </div>
       `;
-      break; // break を追加
+      break;
 
     // テーブル処理を簡略化・堅牢化
     case "table":
@@ -306,7 +308,7 @@ async function renderNonListBlock(
         block_id: block.id,
       });
 
-      html = `<div class="overflow-x-auto my-8 border border-gray-200 dark:border-gray-700 rounded-md">
+      html = `<div class="overflow-x-auto my-8 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">`;
 
@@ -316,11 +318,12 @@ async function renderNonListBlock(
         const cells = row.table_row?.cells || [];
         if (!cells || cells.length === 0) return;
 
-        html += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">'; // Add hover effect
+        html +=
+          '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">'; // Add hover effect and transition
         cells.forEach((cell: any) => {
           // Cell data can be an array of rich text objects
           const cellContent = renderRichText(cell); // Use renderRichText directly
-          html += `<td class="px-6 py-4 whitespace-nowrap text-sm text-primary">${cellContent}</td>`; // Style update
+          html += `<td class="px-6 py-4 whitespace-nowrap text-sm text-primary">${cellContent}</td>`;
         });
         html += "</tr>";
       });
@@ -328,7 +331,7 @@ async function renderNonListBlock(
       html += `</tbody>
         </table>
       </div>`;
-      break; // break を追加
+      break;
 
     case "image":
       const image = (block as any).image;
@@ -339,10 +342,10 @@ async function renderNonListBlock(
         html = `<figure class="my-8">
                 <img src="${imageUrl}" alt="${
           caption || "Image from Notion"
-        }" class="max-w-full h-auto mx-auto rounded-md shadow-md">
+        }" class="max-w-full h-auto mx-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
                 ${
                   caption
-                    ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>`
+                    ? `<figcaption class="text-center text-sm text-muted-foreground mt-2 italic">${caption}</figcaption>`
                     : ""
                 }
              </figure>`;
@@ -350,14 +353,14 @@ async function renderNonListBlock(
       break;
 
     case "divider":
-      html = `<hr class="my-8 border-gray-200 dark:border-gray-700">`;
+      html = `<hr class="my-8 h-px border-0 bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent">`;
       break;
 
     case "callout":
       const callout = (block as any).callout;
       const icon = callout?.icon?.emoji || "💡"; // Default icon
-      html = `<div class="my-6 p-4 border rounded-md flex items-start space-x-3 bg-blue-50 border-blue-200 dark:bg-gray-800 dark:border-blue-900">
-             <span class="text-xl">${icon}</span>
+      html = `<div class="my-6 p-4 border rounded-md flex items-start space-x-3 bg-blue-50/50 border-blue-200 dark:bg-gray-800/60 dark:border-blue-800/30 shadow-sm hover:shadow transition-shadow duration-200">
+             <span class="text-xl select-none">${icon}</span>
              <div class="text-primary">${renderRichText(
                callout?.rich_text
              )}</div>
@@ -379,17 +382,21 @@ async function renderNonListBlock(
         .map((res) => res.html)
         .join("");
       const summary = renderRichText((block as any).toggle?.rich_text);
-      html = `<details class="my-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-                    <summary class="cursor-pointer font-medium text-primary">${summary}</summary>
-                    <div class="mt-2 text-primary">${toggleContent}</div>
+      html = `<details class="my-6 p-4 border rounded-md bg-gray-50/70 dark:bg-gray-700/50 dark:border-gray-600 shadow-sm hover:shadow transition-shadow duration-200">
+                    <summary class="cursor-pointer font-medium text-primary hover:text-primary/80 transition-colors duration-150">${summary}</summary>
+                    <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600 text-primary">${toggleContent}</div>
                 </details>`;
       break;
 
-    // 他のブロックタイプも必要に応じて追加...
     case "child_page":
-      html = `<div class="my-4 p-3 border rounded-md bg-gray-100 dark:bg-gray-700"><p class="font-medium">Child Page: ${
-        (block as any).child_page?.title || "Untitled"
-      }</p></div>`; // Basic rendering
+      html = `<div class="my-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700 hover:shadow-md transition-shadow duration-200 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p class="font-medium text-primary">${
+                  (block as any).child_page?.title || "Untitled"
+                }</p>
+              </div>`;
       break;
 
     case "unsupported":
