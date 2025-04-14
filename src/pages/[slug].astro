@@ -11,7 +11,7 @@ import type {
   BlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import type { HeadingInfo } from "../lib/api/notion";
-import LinkButton from "../components/Atoms/LinkButton.astro";
+import LinkButton from "../components/ui/LinkButton.astro";
 
 export async function getStaticPaths() {
   const posts = await getNotionPosts();

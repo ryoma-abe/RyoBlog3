@@ -1,8 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import BlogArea from "../components/blog/BlogArea.astro";
+import LinkButton from "../components/ui/LinkButton.astro";
 ---
 
 <Layout title="RyoBlog">
   <BlogArea />
+  <div class="mt-20 text-center">
+    <LinkButton href="/blog/page">記事一覧</LinkButton>
+  </div>
 </Layout>
