@@ -28,13 +28,16 @@ export async function getTagCounts() {
 
 // 手動で定義するタグカラー
 export const tagColors: Record<string, string> = {
-  HTML: "bg-orange-600",
-  CSS: "bg-blue-600",
-  JavaScript: "bg-yellow-700",
-  React: "bg-cyan-600",
-  Astro: "bg-purple-600",
-  AI: "bg-pink-600",
-  その他: "bg-gray-600", // fallback
+  HTML: "bg-orange-800/50",
+  CSS: "bg-blue-800/50",
+  JavaScript: "bg-yellow-700/50",
+  React: "bg-cyan-800/50",
+  Astro: "bg-purple-800/50",
+  AI: "bg-pink-800/50",
+  Shopify: "bg-green-800/50",
+  コラム: "bg-indigo-800/50",
+  開発環境: "bg-indigo-800/50",
+  その他: "bg-gray-800/50",
 };
 
 // タグ名から色を取得（定義がなければ "その他" を使う）
