@@ -13,10 +13,12 @@ const keywords = Astro.props.keywords ?? meta.keywords;
 
 // 記事詳細ページかどうか（例: /test-article のような1階層のみ）
 const isArticlePage =
-  /^\/[^\/]+$/.test(Astro.url.pathname) &&
-  !["/about", "/contact", "/blog", "thanks", "/blog"].includes(
+  Astro.url.pathname.slice(1).split("/").filter(Boolean).length === 1 &&
+  !["/about", "/contact", "/blog", "/thanks", "/blog"].includes(
     Astro.url.pathname
   );
+
+console.log(`Path: ${Astro.url.pathname}, isArticlePage: ${isArticlePage}`);
 ---
 
 <!doctype html>
@@ -75,15 +77,16 @@ const isArticlePage =
     <main>
       <div class="container mx-auto pt-10 pb-20 px-5">
         {
-          !isArticlePage && (
+          isArticlePage === false && (
             <h1 class="text-4xl font-bold text-center">{title}</h1>
           )
         }
+
         {
-          title !== "送信完了" &&
+          isArticlePage === false &&
+            title !== "送信完了" &&
             title !== "お問い合わせ" &&
-            title !== "About" &&
-            !isArticlePage && <CategoryButton />
+            title !== "About" && <CategoryButton />
         }
         <slot />
       </div>
