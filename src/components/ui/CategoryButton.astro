@@ -22,11 +22,42 @@ if (uniqueTags.length === 0) {
 
 <div class="w-fit mx-auto text-center">
   <ul class="flex flex-wrap justify-center gap-3 mt-10">
+    <!-- ALLカテゴリを追加 -->
+    {
+      (() => {
+        const allUrl = "/";
+        const isAllActive = currentPath === "/" || currentPath === "/blog";
+
+        return (
+          <li class="relative group">
+            <a
+              href={allUrl}
+              class={`px-5 py-2 font-medium transition-colors text-primary ${
+                isAllActive ? "pointer-events-none" : "group-hover:text-primary"
+              }`}
+            >
+              ALL
+            </a>
+            <span
+              class={`absolute left-0 -bottom-0.5 w-full h-0.5 transition-transform duration-300 ${
+                isAllActive
+                  ? "bg-red-400"
+                  : "bg-red-400 scale-x-0 group-hover:scale-x-100 origin-left"
+              }`}
+            />
+          </li>
+        );
+      })()
+    }
+
     {
       uniqueTags.map((tag) => {
         // 既存のファイル構造に合わせてURLを構築
         const tagUrl = `/tags/${encodeURIComponent(tag)}`;
-        const isActive = currentPath === tagUrl;
+        // 本番環境でも正しく動作するように修正
+        const isActive = currentPath.includes(
+          `/tags/${encodeURIComponent(tag)}`
+        );
 
         return (
           <li class="relative group">
