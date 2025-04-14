@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { Image } from "astro:assets";
-import OptimizedImage from "../components/NotionImage/OptimizedImage.astro";
 import {
   getNotionPosts,
   getNotionBlocks,
@@ -133,47 +131,6 @@ const relatedPosts = allPosts
       class="prose prose-lg dark:prose-invert max-w-none mt-8"
       set:html={content}
     />
-
-    <script>
-      // 画像最適化用スクリプト
-      document.addEventListener("DOMContentLoaded", () => {
-        const optimizedImageContainers = document.querySelectorAll(
-          '[data-astro-optimized-image="true"]'
-        );
-
-        optimizedImageContainers.forEach((container) => {
-          if (container instanceof HTMLElement) {
-            const src = container.dataset.src;
-            const alt = container.dataset.alt || "";
-            const caption = container.dataset.caption || "";
-
-            if (src) {
-              // WebP対応をチェック
-              const webpSupport = "image-webp" in document.createElement("img");
-
-              // 対応している場合、img要素を直接置き換え
-              const img = container.querySelector("img");
-              if (img) {
-                // imgタグに最適化のための追加属性を設定
-                img.setAttribute("loading", "lazy");
-                img.setAttribute("decoding", "async");
-
-                if (webpSupport) {
-                  // srcsetでさまざまなサイズに対応（ここではブラウザの処理に任せる）
-                  const originalSrc = new URL(src);
-                  const fileExt = originalSrc.pathname.split(".").pop() || "";
-
-                  // クエリパラメータがない場合はwebp変換のクエリを追加
-                  if (!originalSrc.search) {
-                    img.setAttribute("type", "image/webp");
-                  }
-                }
-              }
-            }
-          }
-        });
-      });
-    </script>
 
     <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
       <LinkButton href="/blog/page"> &larr; 一覧へ戻る </LinkButton>
