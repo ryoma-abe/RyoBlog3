@@ -23,7 +23,9 @@ const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 ---
 
 <Layout title="ブログ一覧">
-  <BlogArea />
+  <div class="mt-20">
+    <BlogArea />
+  </div>
   <div class="mt-8">
     <Pagination
       currentPage={currentPage}

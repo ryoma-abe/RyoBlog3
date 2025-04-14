@@ -16,7 +16,7 @@ const end = start + POSTS_PER_PAGE;
 const paginatedPosts = allPosts.slice(start, end);
 ---
 
-<div class="grid grid-auto-300 gap-8 mt-8">
+<div class="grid grid-auto-300 gap-8">
   {
     paginatedPosts.map((post: PageObjectResponse) => {
       const title =
