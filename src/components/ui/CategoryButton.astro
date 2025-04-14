@@ -5,6 +5,9 @@ import { getNotionPosts } from "../../lib/api/notion.ts";
 const posts = await getNotionPosts();
 const currentPath = Astro.url.pathname;
 
+// トップページではコンポーネントを表示しない
+if (currentPath === "/") return null;
+
 // カテゴリ一覧を取得（重複排除）
 const allTags = posts.flatMap((post) => {
   const tags = (post.properties.Tags as any)?.multi_select || [];
@@ -25,8 +28,9 @@ if (uniqueTags.length === 0) {
     <!-- ALLカテゴリを追加 -->
     {
       (() => {
-        const allUrl = "/";
-        const isAllActive = currentPath === "/" || currentPath === "/blog";
+        const allUrl = "/blog/page/1";
+        // 記事一覧ページの場合のみALLをアクティブに
+        const isAllActive = currentPath.startsWith("/blog/page");
 
         return (
           <li class="relative group">
