@@ -11,7 +11,7 @@ import Pagination from "../../../components/blog/Pagination.astro";
 // ページのパスを生成
 export async function getStaticPaths() {
   // ページサイズを定義 (関数内に移動)
-  const POSTS_PER_PAGE = 9;
+  const POSTS_PER_PAGE = 12;
 
   const allPosts = await getAllPosts();
   const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);

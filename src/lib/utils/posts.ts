@@ -24,7 +24,10 @@ export async function getAllPosts() {
  * @returns スラッグ
  */
 export function getSlugFromId(id: string): string {
-  return id.replace("blog/", "").replace(".md", "").replace(".mdx", "");
+  // blog/カテゴリ/ファイル名.md の形式から、ファイル名部分だけを取得
+  const parts = id.split("/");
+  const filename = parts[parts.length - 1];
+  return filename.replace(".md", "").replace(".mdx", "");
 }
 
 /**

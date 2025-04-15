@@ -5,8 +5,6 @@ tags: ["JavaScript", "プログラミング"]
 description: JavaScript開発をより効率的にするためのテクニックをご紹介します
 ---
 
-# JavaScript 開発者必見のヒント集
-
 JavaScript で効率よく開発するためのテクニックを集めました。
 
 ## 非同期処理のベストプラクティス
