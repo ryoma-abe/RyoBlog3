@@ -4,6 +4,7 @@
 import Layout from "../../layouts/Layout.astro";
 import BlogArea from "../../components/blog/BlogArea.astro";
 import { getCollection } from "astro:content";
+import CategoryButton from "../../components/ui/CategoryButton.astro";
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
@@ -37,10 +38,11 @@ const { tag } = Astro.params;
 ---
 
 <Layout title={`${tag}の記事一覧`}>
+  <CategoryButton />
   <div class="mt-20">
     {
       posts.length === 0 ? (
-        <p class="text-center text-gray-500">記事が見つかりませんでした</p>
+        <p class="text-center text-primary">記事が見つかりませんでした</p>
       ) : (
         <BlogArea customPosts={posts} />
       )
