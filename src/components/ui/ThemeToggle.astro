@@ -97,8 +97,8 @@
     "(prefers-color-scheme: dark)"
   );
 
-  // ページロード時に実行する初期設定
-  document.addEventListener("DOMContentLoaded", (): void => {
+  // テーマ切り替えの初期化処理
+  const initThemeToggle = (): void => {
     const toggle: HTMLElement | null = document.getElementById("theme-toggle");
 
     // ローカルストレージからテーマを取得、なければシステム設定を使用
@@ -124,5 +124,11 @@
         document.documentElement.classList.toggle("dark", e.matches);
       }
     });
-  });
+  };
+
+  // 通常のページロード時
+  document.addEventListener("DOMContentLoaded", initThemeToggle);
+
+  // Astroのページ遷移後
+  document.addEventListener("astro:page-load", initThemeToggle);
 </script>

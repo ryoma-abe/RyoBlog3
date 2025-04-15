@@ -4,6 +4,7 @@ import Footer from "../components/common/Footer.astro";
 import { getMeta } from "../lib/utils/meta";
 import "../styles/global.css";
 import CategoryButton from "../components/ui/CategoryButton.astro";
+import { ClientRouter } from "astro:transitions";
 
 const meta = getMeta(Astro.url.pathname);
 
@@ -26,6 +27,7 @@ const isArticlePage =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <ClientRouter />
     <meta name="description" content={description} />
     <meta name="keywords" content={keywordsString} />
     <meta property="og:title" content={title} />
@@ -42,31 +44,46 @@ const isArticlePage =
     <!-- 残りはそのまま -->
 
     <script is:inline>
-      const theme = (() => {
-        if (
-          typeof localStorage !== "undefined" &&
-          localStorage.getItem("theme")
-        ) {
-          return localStorage.getItem("theme");
-        }
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          return "dark";
-        }
-        return "light";
-      })();
+      // ダークモードの初期設定
+      const initTheme = () => {
+        const theme = (() => {
+          if (
+            typeof localStorage !== "undefined" &&
+            localStorage.getItem("theme")
+          ) {
+            return localStorage.getItem("theme");
+          }
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            return "dark";
+          }
+          return "light";
+        })();
 
-      if (theme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      };
+
+      // 初期ロード時
+      initTheme();
+
+      // Astroのページ遷移後
+      document.addEventListener("astro:page-load", initTheme);
     </script>
 
     <!-- コードブロックのコピー機能 -->
     <script is:inline>
-      document.addEventListener("DOMContentLoaded", () => {
+      // コードブロックのコピー機能の初期化
+      const initCodeCopyButtons = () => {
         // コードブロックの各pre要素にコピーボタンを追加
         document.querySelectorAll("pre").forEach((pre) => {
+          // すでにラッパーで囲まれている場合はスキップ
+          if (pre.parentNode.classList.contains("code-block-wrapper")) {
+            return;
+          }
+
           // ラッパー要素を作成してpreを囲む
           const wrapper = document.createElement("div");
           wrapper.className = "code-block-wrapper relative";
@@ -105,7 +122,13 @@ const isArticlePage =
               });
           });
         });
-      });
+      };
+
+      // 初期ロード時
+      document.addEventListener("DOMContentLoaded", initCodeCopyButtons);
+
+      // Astroのページ遷移後
+      document.addEventListener("astro:page-load", initCodeCopyButtons);
     </script>
   </head>
   <body class="bg-primary text-primary">
