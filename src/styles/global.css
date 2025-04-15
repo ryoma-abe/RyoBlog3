@@ -44,3 +44,75 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
 }
+/* ===============================================
+# 記事のスタイル
+=============================================== */
+.markdown-content {
+  @apply text-[var(--color-primary-text)];
+}
+
+.markdown-content h1 {
+  @apply text-3xl font-bold mt-8 mb-4;
+}
+
+.markdown-content h2 {
+  @apply text-2xl font-bold mt-6 mb-3;
+}
+
+.markdown-content h3 {
+  @apply text-xl font-bold mt-5 mb-2;
+}
+
+.markdown-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply mb-4 ml-6;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content li {
+  @apply mb-2;
+}
+
+.markdown-content a {
+  @apply text-blue-600 hover:underline dark:text-blue-400;
+}
+
+.markdown-content blockquote {
+  @apply pl-4 border-l-4 border-gray-300 italic my-4;
+}
+
+.markdown-content code {
+  @apply px-1 py-0.5 rounded text-sm;
+}
+
+.markdown-content pre {
+  @apply p-4 rounded-md overflow-x-auto my-4;
+}
+
+.markdown-content img {
+  @apply max-w-full h-auto my-4 rounded-md;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse my-4;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-gray-300 p-2;
+}
+
+.markdown-content th {
+  @apply bg-gray-100;
+}

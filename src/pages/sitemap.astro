@@ -1,0 +1,80 @@
+---
+import { getCollection } from "astro:content";
+
+const url = "http://web-ryoma.conohawing.com";
+
+// 記事一覧を取得
+const articles = await getCollection("blog");
+
+// 日付フォーマット関数
+function formatDate(date: Date): string {
+  return date.toISOString().split("T")[0];
+}
+
+// 更新日時を取得
+const now = new Date();
+
+// メインページの更新日時
+const indexModified = formatDate(now);
+
+// 現在の日時を取得
+const currentDate = new Date().toISOString();
+---
+
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- トップページ -->
+  <url>
+    <loc>{url}/</loc>
+    <lastmod>{indexModified}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 固定ページ -->
+  <url>
+    <loc>{url}/about</loc>
+    <lastmod>{indexModified}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>{url}/contact</loc>
+    <lastmod>{indexModified}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 記事ページ -->
+  {
+    articles.map((article) => {
+      // 記事のスラッグ
+      const slug = article.data.slug;
+      // 記事の日付
+      const date =
+        article.data.date instanceof Date
+          ? formatDate(article.data.date)
+          : formatDate(new Date(article.data.date));
+
+      return (
+        <url>
+          <loc>
+            {url}/{slug}
+          </loc>
+          <lastmod>{date}</lastmod>
+          <changefreq>weekly</changefreq>
+          <priority>0.7</priority>
+        </url>
+      );
+    })
+  }
+
+  <!-- ブログ一覧 -->
+  <url>
+    <loc>{url}/blog/page/1</loc>
+    <lastmod>{currentDate}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+</urlset>
