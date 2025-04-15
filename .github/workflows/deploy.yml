@@ -19,8 +19,11 @@ jobs:
           node-version: "18"
           cache: "npm"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Clean & Install dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --no-optional
+          npm install @rollup/rollup-linux-x64-gnu
 
       - name: Build Astro site
         run: npm run build
