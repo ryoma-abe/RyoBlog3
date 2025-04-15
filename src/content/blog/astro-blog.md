@@ -1,29 +1,70 @@
 ---
-title: Astroでブログを作る
-date: "2023-11-15"
-tags: ["Astro", "ブログ"]
-description: Astroを使ったブログサイトの作り方
+title: "MDX記法のテスト記事"
+description: "MDXで使用できる代表的な記法をテストするための記事です。"
+date: "2025-04-15"
+slug: "mdx-test-article"
+tags: ["テスト", "MDX", "Astro"]
 ---
 
-# Astro でブログを作る方法
+# 見出し 1（H1）
 
-Astro を使うと、高速で優れたブログサイトを簡単に構築できます。
+## 見出し 2（H2）
 
-## 特徴
+### 見出し 3（H3）
 
-- **高速**: 最小限の JavaScript でページを提供します
-- **マークダウンサポート**: MDX でマークダウンとコンポーネントを組み合わせられます
-- **コンテンツコレクション**: 型安全なコンテンツ管理が可能です
+#### 見出し 4（H4）
 
-## コード例
+---
 
-```javascript
-// src/pages/[slug].astro
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
-}
+## 段落と強調表現
+
+これは通常の段落です。**太字**、_斜体_、**_太字 + 斜体_**、~~打ち消し線~~。
+
+---
+
+## リスト
+
+### 番号なしリスト
+
+- りんご
+- みかん
+- バナナ
+
+### 番号付きリスト
+
+1. 最初のステップ
+2. 次のステップ
+3. 最後のステップ
+
+---
+
+## リンク
+
+[りょうまオンライン](https://www.ryoma.online/)
+
+[記事内リンク](#テーブル)
+
+---
+
+## 画像
+
+![サンプル画像](https://placehold.jp/300x200.png?text=Sample)
+
+---
+
+## インラインコード
+
+このように `const message = "Hello MDX";` のような記述ができます。
+
+---
+
+## コードブロック
+
+```js
+// JavaScriptの例
+const greet = (name) => {
+  return `こんにちは、${name}さん！`;
+};
+
+console.log(greet("りょうま"));
 ```

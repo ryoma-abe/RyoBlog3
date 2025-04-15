@@ -2,10 +2,17 @@
 import { getAllPosts, getSlugFromId } from "../../lib/utils/posts";
 import { getTagColor } from "../../lib/utils/tags";
 import { formatDate } from "../../lib/utils/utils";
+import type { CollectionEntry } from "astro:content";
 
 // 記事データを取得
+interface Props {
+  customPosts?: CollectionEntry<"blog">[];
+}
+
+const { customPosts } = Astro.props;
 const allPosts = await getAllPosts();
-const sortedPosts = allPosts.slice(0, 6); // トップページには最新6件のみ表示
+// カスタムポストがある場合はそれを使用、ない場合はデフォルトのポスト
+const sortedPosts = customPosts || allPosts.slice(0, 12);
 ---
 
 <div class="grid grid-auto-300 gap-8">
@@ -22,7 +29,7 @@ const sortedPosts = allPosts.slice(0, 6); // トップページには最新6件�
               <div
                 class={`h-48 flex items-center justify-center text-white text-center rounded-t-lg ${getTagColor(tag)}`}
               >
-                <p class="text-xl font-bold px-4">{title}</p>
+                <h2 class="text-xl font-bold px-4">{title}</h2>
               </div>
               <div class="px-6 py-6">
                 <div class="flex justify-between items-center">
@@ -47,8 +54,7 @@ const sortedPosts = allPosts.slice(0, 6); // トップページには最新6件�
                     )}
                   </p>
                 </div>
-                {description && <p class="mt-4 text-gray-600">{description}</p>}
-                <h2 class="mt-5">{title}</h2>
+                <p class="mt-5">{description}</p>
               </div>
             </a>
           </div>
@@ -60,13 +66,4 @@ const sortedPosts = allPosts.slice(0, 6); // トップページには最新6件�
       </div>
     )
   }
-</div>
-
-<div class="flex justify-center mt-8">
-  <a
-    href="/blog/page/1"
-    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
-  >
-    すべての記事を見る
-  </a>
 </div>
