@@ -1,12 +1,9 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import {
-  getAllPosts,
-  paginateItems,
-  getSlugFromId,
-} from "../../../lib/utils/posts";
+import { getAllPosts, paginateItems } from "../../../lib/utils/posts";
 import BlogArea from "../../../components/blog/BlogArea.astro";
 import Pagination from "../../../components/blog/Pagination.astro";
+import CategoryButton from "../../../components/ui/CategoryButton.astro";
 
 // ページのパスを生成
 export async function getStaticPaths() {
@@ -35,6 +32,7 @@ const { items: posts } = paginatedPosts;
 ---
 
 <Layout title="記事一覧">
+  <CategoryButton />
   <div class="mt-20">
     <BlogArea customPosts={posts} />
     <Pagination

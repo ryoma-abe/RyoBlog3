@@ -3,22 +3,53 @@ import Header from "../components/common/Header.astro";
 import Footer from "../components/common/Footer.astro";
 import { getMeta } from "../lib/utils/meta";
 import "../styles/global.css";
-import CategoryButton from "../components/ui/CategoryButton.astro";
 import { ClientRouter } from "astro:transitions";
-
-const meta = getMeta(Astro.url.pathname);
-
-const title = Astro.props.title ?? meta.title;
-const description = Astro.props.description ?? meta.description;
-const keywords = Astro.props.keywords ?? meta.keywords;
-const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
 
 // 記事詳細ページかどうか（例: /test-article のような1階層のみ）
 const isArticlePage =
   Astro.url.pathname.slice(1).split("/").filter(Boolean).length === 1 &&
-  !["/about", "/contact", "/blog", "/thanks", "/blog"].includes(
+  !["/about", "/contact", "/blog", "/thanks", "/tags"].includes(
     Astro.url.pathname
   );
+
+// タグページかどうか（例: /tags/javascript のような形式）
+const isTagPage =
+  Astro.url.pathname.startsWith("/tags/") &&
+  Astro.url.pathname.slice(1).split("/").filter(Boolean).length === 2;
+
+// 記事データがpropsとして渡された場合は、それを使用する
+const { articleData } = Astro.props;
+
+// 正規化されたパス（末尾のスラッシュを考慮）
+const normalizedPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname.slice(0, -1) || "/"
+  : Astro.url.pathname;
+
+// ブログ一覧ページかどうか
+const isBlogIndexPage =
+  normalizedPath === "/blog" || normalizedPath.startsWith("/blog/page/");
+
+// 記事データがある場合は記事のメタ情報、ない場合はpathからメタ情報を取得
+const meta = articleData
+  ? {
+      title: `${articleData.title} | RyoBlog`,
+      description: articleData.description || "",
+      keywords: articleData.tags || [],
+    }
+  : getMeta(isBlogIndexPage ? "/blog" : normalizedPath);
+
+// ページのh1タイトル用（表示用のみに使用）
+const pageHeadingTitle = Astro.props.title || meta.title.split(" | ")[0];
+
+// SEO用のメタタイトル（完全なタイトル）
+const metaTitle =
+  isTagPage && Astro.props.title
+    ? Astro.props.title // タグページの場合は、明示的に設定されたタイトルを使用
+    : meta.title; // それ以外はmeta.jsonのタイトルを使用
+
+const description = Astro.props.description ?? meta.description;
+const keywords = Astro.props.keywords ?? meta.keywords;
+const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
 ---
 
 <!doctype html>
@@ -26,20 +57,26 @@ const isArticlePage =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
+    <title>{metaTitle}</title>
     <ClientRouter />
     <meta name="description" content={description} />
     <meta name="keywords" content={keywordsString} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={metaTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://web-ryoma.conohawing.com/" />
+    <meta property="og:type" content={isArticlePage ? "article" : "website"} />
+    <meta
+      property="og:url"
+      content={`https://web-ryoma.conohawing.com${Astro.url.pathname}`}
+    />
     <meta
       property="og:image"
       content="https://web-ryoma.conohawing.com/images/ogp.png"
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="canonical" href="https://web-ryoma.conohawing.com/" />
+    <link
+      rel="canonical"
+      href={`https://web-ryoma.conohawing.com${Astro.url.pathname}`}
+    />
     <link rel="icon" href="/favicon.png" type="image/png" />
     <!-- 残りはそのまま -->
 
@@ -136,16 +173,9 @@ const isArticlePage =
     <main>
       <div class="container mx-auto py-20 px-5">
         {
-          isArticlePage === false && (
-            <h1 class="text-4xl font-bold text-center">{title}</h1>
+          isArticlePage === false && !isTagPage && (
+            <h1 class="text-4xl font-bold text-center">{pageHeadingTitle}</h1>
           )
-        }
-
-        {
-          isArticlePage === false &&
-            title !== "送信完了" &&
-            title !== "お問い合わせ" &&
-            title !== "About" && <CategoryButton />
         }
         <slot />
       </div>

@@ -28,5 +28,10 @@
     "title": "記事一覧 | RyoBlog",
     "description": "RyoBlogの最新記事一覧はこちら。Web制作やShopify、プログラミング学習などに関する記事を掲載中。",
     "keywords": ["ブログ", "記事一覧", "Web制作", "Shopify", "プログラミング"]
+  },
+  "/tags": {
+    "title": "記事一覧 | RyoBlog",
+    "description": "RyoBlogの最新記事一覧はこちら。Web制作やShopify、プログラミング学習などに関する記事を掲載中。",
+    "keywords": ["ブログ", "記事一覧", "Web制作", "Shopify", "プログラミング"]
   }
 }
