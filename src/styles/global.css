@@ -56,13 +56,16 @@
 }
 
 .markdown-content h2 {
-  @apply text-2xl font-bold mt-6 mb-3;
+  @apply text-2xl font-bold mt-6 mb-3 border border-dashed p-3;
 }
 
 .markdown-content h3 {
-  @apply text-xl font-bold mt-5 mb-2;
+  @apply text-xl font-bold mt-5 mb-2  pl-3 border-l-2;
 }
 
+.markdown-content h4 {
+  @apply text-lg font-bold mt-5 mb-2;
+}
 .markdown-content p {
   @apply mb-4 leading-relaxed;
 }
@@ -92,8 +95,8 @@
   @apply pl-4 border-l-4 border-gray-300 italic my-4;
 }
 
-.markdown-content code {
-  @apply px-1 py-0.5 rounded text-sm;
+.markdown-content code:not(pre code) {
+  @apply p-1 rounded text-sm bg-gray-600;
 }
 
 .markdown-content pre {
