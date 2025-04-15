@@ -13,22 +13,21 @@ export async function getStaticPaths() {
 
   const paths = Array.from({ length: totalPages }, (_, i) => ({
     params: { page: i === 0 ? undefined : String(i + 1) },
+    props: {
+      posts: allPosts.slice(i * POSTS_PER_PAGE, (i + 1) * POSTS_PER_PAGE),
+      currentPage: i + 1,
+      totalPages: totalPages,
+    },
   }));
   return paths;
 }
 
-const POSTS_PER_PAGE = 12;
-const allPosts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
-});
-const pageParam = Astro.params.page;
-const currentPage = pageParam ? parseInt(pageParam) : 1;
-const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+const { posts, currentPage, totalPages } = Astro.props;
 ---
 
 <Layout title="ブログ一覧">
   <div class="mt-20">
-    <BlogArea />
+    <BlogArea customPosts={posts} />
   </div>
   <div class="mt-8">
     <Pagination

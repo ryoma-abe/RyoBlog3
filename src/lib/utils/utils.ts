@@ -18,7 +18,6 @@ export function formatDate(dateString: string): string {
       day: "numeric",
     });
   } catch (e) {
-    console.error("Date formatting error:", e);
     return dateString;
   }
 }

@@ -8,7 +8,6 @@ export const collections = {
     // スキーマを定義（シンプルに保持）
     schema: z.object({
       title: z.string(),
-      // 日付は文字列または日付オブジェクトとして受け入れる
       date: z.coerce.date(),
       tags: z.array(z.string()),
       description: z.string(),
