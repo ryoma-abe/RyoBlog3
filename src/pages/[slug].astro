@@ -3,30 +3,23 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import { formatDate } from "../lib/utils/utils";
 import { getTagColor } from "../lib/utils/tags";
+import { getAllPosts, getSlugFromId } from "../lib/utils/posts";
 
-// 1. 生成するページのパスを定義
+// ページのパスを生成
 export async function getStaticPaths() {
-  const blogEntries = await getCollection("blog");
+  const allPosts = await getAllPosts();
 
-  return blogEntries.map((entry) => ({
+  return allPosts.map((entry) => ({
     params: {
-      // ファイル名をスラッグとして使用（blog/post-1.md → post-1）
-      slug: entry.id
-        .replace("blog/", "")
-        .replace(".md", "")
-        .replace(".mdx", ""),
+      slug: getSlugFromId(entry.id),
     },
     props: { entry },
   }));
 }
 
-// 2. このページテンプレートでは、propsから渡されたentryが使用できます
+// ページのコンテンツを取得
 const { entry } = Astro.props;
 const { Content } = await entry.render();
-
-// デバッグ用
-console.log(`記事スラッグ: ${Astro.params.slug}`);
-console.log(`記事ID: ${entry.id}`);
 ---
 
 <Layout title={entry.data.title}>
@@ -67,8 +60,11 @@ console.log(`記事ID: ${entry.id}`);
         <Content />
       </div>
 
-      <div class="mt-12 pt-6 border-t">
-        <a href="/" class="text-blue-500 hover:underline">← 記事一覧に戻る</a>
+      <div class="mt-12 pt-6 border-t flex justify-between">
+        <a href="/" class="text-blue-500 hover:underline">← トップページ</a>
+        <a href="/blog/page/1" class="text-blue-500 hover:underline"
+          >すべての記事 →</a
+        >
       </div>
     </article>
   </main>
