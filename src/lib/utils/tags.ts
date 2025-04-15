@@ -47,23 +47,25 @@ export const tagColors: Record<string, string> = {
  */
 export function getTagColor(tag: string): string {
   const tagColorMap: Record<string, string> = {
-    Astro: "bg-purple-600",
-    HTML: "bg-orange-600",
-    CSS: "bg-blue-600",
-    JavaScript: "bg-yellow-600",
-    TypeScript: "bg-blue-700",
-    React: "bg-sky-500",
-    Vue: "bg-emerald-600",
-    "Next.js": "bg-black",
-    "Nuxt.js": "bg-green-700",
+    astro: "bg-purple-600",
+    html: "bg-orange-600",
+    css: "bg-blue-600",
+    javascript: "bg-yellow-600",
+    typescript: "bg-blue-700",
+    react: "bg-sky-500",
+    vue: "bg-emerald-600",
+    "next.js": "bg-black",
+    "nuxt.js": "bg-green-700",
     サンプル: "bg-indigo-600",
     テスト: "bg-gray-600",
-    MDX: "bg-pink-600",
+    mdx: "bg-pink-600",
     画像: "bg-red-500",
     画像最適化: "bg-amber-600",
     ブログ: "bg-cyan-600",
+    shopify: "bg-green-800",
   };
 
-  // タグに対応する色がある場合はその色を返し、なければデフォルト色を返す
-  return tagColorMap[tag] || "bg-gray-600";
+  // タグを小文字に変換して大文字小文字を区別せずに色を取得
+  const normalizedTag = tag.toLowerCase();
+  return tagColorMap[normalizedTag] || "bg-gray-600";
 }

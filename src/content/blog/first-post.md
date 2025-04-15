@@ -1,7 +1,7 @@
 ---
 title: はじめての投稿
 date: 2023-11-10
-tags: ["テスト"]
+tags: ["Shopify"]
 description: はじめてのブログ投稿です
 ---
 

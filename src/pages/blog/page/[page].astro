@@ -5,8 +5,8 @@ import {
   paginateItems,
   getSlugFromId,
 } from "../../../lib/utils/posts";
-import { formatDate } from "../../../lib/utils/utils";
-import { getTagColor } from "../../../lib/utils/tags";
+import BlogArea from "../../../components/blog/BlogArea.astro";
+import Pagination from "../../../components/blog/Pagination.astro";
 
 // ページのパスを生成
 export async function getStaticPaths() {
@@ -31,95 +31,16 @@ export async function getStaticPaths() {
 
 // ページのコンテンツを取得
 const { page, totalPages, paginatedPosts } = Astro.props;
-const { items: posts, pagination } = paginatedPosts;
+const { items: posts } = paginatedPosts;
 ---
 
-<Layout title={`ブログ - ページ ${page}`}>
-  <main class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8 text-center">すべての記事</h1>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {
-        posts.map((post) => {
-          const { title, tags, date, description } = post.data;
-          const slug = getSlugFromId(post.id);
-          const tag =
-            Array.isArray(tags) && tags.length > 0 ? tags[0] : "その他";
-
-          return (
-            <div class="border-primary rounded-lg transition duration-300 hover:scale-102 hover:shadow-lg">
-              <a href={`/${slug}`} class="block">
-                <div
-                  class={`h-48 flex items-center justify-center text-white text-center rounded-t-lg ${getTagColor(tag)}`}
-                >
-                  <p class="text-xl font-bold px-4">{title}</p>
-                </div>
-                <div class="px-6 py-6">
-                  <div class="flex justify-between items-center">
-                    <div class="flex gap-2 flex-wrap">
-                      {Array.isArray(tags) && tags.length > 0 ? (
-                        tags.map((tag) => (
-                          <span
-                            class={`text-sm px-3 py-1 rounded-full ${getTagColor(tag)} text-white`}
-                          >
-                            {tag}
-                          </span>
-                        ))
-                      ) : (
-                        <span class="text-sm px-3 py-1 rounded-full bg-gray-500 text-white">
-                          その他
-                        </span>
-                      )}
-                    </div>
-                    <p class="text-primary text-sm">
-                      {formatDate(
-                        date instanceof Date ? date.toISOString() : String(date)
-                      )}
-                    </p>
-                  </div>
-                  {description && (
-                    <p class="mt-4 text-gray-600">{description}</p>
-                  )}
-                  <h2 class="mt-5">{title}</h2>
-                </div>
-              </a>
-            </div>
-          );
-        })
-      }
-    </div>
-
-    <!-- ページネーション -->
-    <div class="flex justify-center items-center mt-12 gap-4">
-      {
-        pagination.hasPrevPage && (
-          <a
-            href={`/blog/page/${page - 1}`}
-            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
-          >
-            前のページ
-          </a>
-        )
-      }
-
-      <span class="text-gray-600">
-        {page} / {totalPages}
-      </span>
-
-      {
-        pagination.hasNextPage && (
-          <a
-            href={`/blog/page/${page + 1}`}
-            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
-          >
-            次のページ
-          </a>
-        )
-      }
-    </div>
-
-    <div class="mt-8 text-center">
-      <a href="/" class="text-blue-500 hover:underline"> ← ホームに戻る </a>
-    </div>
-  </main>
+<Layout title="記事一覧">
+  <div class="mt-20">
+    <BlogArea customPosts={posts} />
+    <Pagination
+      currentPage={page}
+      totalPages={totalPages}
+      baseUrl="/blog/page"
+    />
+  </div>
 </Layout>

@@ -3,7 +3,7 @@ title: "MDX記法のテスト記事"
 description: "MDXで使用できる代表的な記法をテストするための記事です。"
 date: "2025-04-15"
 slug: "mdx-test-article"
-tags: ["テスト", "MDX", "Astro"]
+tags: ["JavaScript", "MDX", "Astro"]
 ---
 
 # 見出し 1（H1）
