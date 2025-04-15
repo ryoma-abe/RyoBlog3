@@ -1,5 +1,4 @@
 ---
-import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import { formatDate } from "../lib/utils/utils";
 import { getTagColor } from "../lib/utils/tags";
@@ -38,7 +37,7 @@ const relatedPosts = allPosts
 <Layout title={entry.data.title}>
   <article class="prose max-w-3xl mx-auto">
     <div class="mb-8">
-      <h2 class="text-4xl font-bold mb-2">{entry.data.title}</h2>
+      <h2 class="text-4xl font-bold mb-10 text-center">{entry.data.title}</h2>
       <div class="flex items-center justify-between mb-8">
         <div class="flex gap-2 flex-wrap">
           {
@@ -88,7 +87,7 @@ const relatedPosts = allPosts
                     </span>
                   ))}
                 </div>
-                <p class="text-sm text-gray-600">{post.data.description}</p>
+                <p class="text-sm">{post.data.description}</p>
               </a>
             ))}
           </div>
