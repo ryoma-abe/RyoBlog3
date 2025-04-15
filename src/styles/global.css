@@ -119,3 +119,22 @@
 .markdown-content th {
   @apply bg-gray-100;
 }
+
+/* コードブロックのスタイル */
+.code-block-wrapper {
+  @apply relative;
+}
+
+.code-block-wrapper pre {
+  @apply pr-20;
+}
+
+.copy-button {
+  @apply absolute top-2 right-2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-70 hover:opacity-100 transition-opacity z-10;
+}
+
+@media (max-width: 640px) {
+  .copy-button {
+    @apply text-xs px-1.5 py-0.5;
+  }
+}

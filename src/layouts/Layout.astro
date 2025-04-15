@@ -61,6 +61,52 @@ const isArticlePage =
         document.documentElement.classList.remove("dark");
       }
     </script>
+
+    <!-- コードブロックのコピー機能 -->
+    <script is:inline>
+      document.addEventListener("DOMContentLoaded", () => {
+        // コードブロックの各pre要素にコピーボタンを追加
+        document.querySelectorAll("pre").forEach((pre) => {
+          // ラッパー要素を作成してpreを囲む
+          const wrapper = document.createElement("div");
+          wrapper.className = "code-block-wrapper relative";
+          pre.parentNode.insertBefore(wrapper, pre);
+          wrapper.appendChild(pre);
+
+          // コピーボタンを作成
+          const copyButton = document.createElement("button");
+          copyButton.className =
+            "copy-button absolute top-2 right-2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-70 hover:opacity-100 transition-opacity";
+          copyButton.textContent = "コピー";
+          wrapper.appendChild(copyButton);
+
+          // コピーボタンのクリックイベント
+          copyButton.addEventListener("click", () => {
+            // pre内のcode要素からテキストを取得
+            const code = pre.querySelector("code");
+            const text = code ? code.innerText : pre.innerText;
+
+            // クリップボードにコピー
+            navigator.clipboard
+              .writeText(text)
+              .then(() => {
+                // コピー成功時の表示
+                copyButton.textContent = "コピー完了！";
+                setTimeout(() => {
+                  copyButton.textContent = "コピー";
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("コピーに失敗しました:", err);
+                copyButton.textContent = "コピー失敗";
+                setTimeout(() => {
+                  copyButton.textContent = "コピー";
+                }, 2000);
+              });
+          });
+        });
+      });
+    </script>
   </head>
   <body class="bg-primary text-primary">
     <Header />

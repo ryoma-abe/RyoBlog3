@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import { formatDate } from "../lib/utils/utils";
 import { getTagColor } from "../lib/utils/tags";
 import { getAllPosts, getSlugFromId } from "../lib/utils/posts";
+import LinkButton from "../components/ui/LinkButton.astro";
 
 // ページのパスを生成
 export async function getStaticPaths() {
@@ -20,6 +21,18 @@ export async function getStaticPaths() {
 // ページのコンテンツを取得
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+
+// 関連記事を取得（同じタグを持つ記事、最大4件）
+const allPosts = await getAllPosts();
+const relatedPosts = allPosts
+  .filter(
+    (post) =>
+      post.id !== entry.id && // 現在の記事を除外
+      post.data.tags &&
+      entry.data.tags &&
+      post.data.tags.some((tag) => entry.data.tags.includes(tag))
+  )
+  .slice(0, 4); // 最大4件まで
 ---
 
 <Layout title={entry.data.title}>
@@ -52,6 +65,40 @@ const { Content } = await entry.render();
 
     <div class="markdown-content">
       <Content />
+    </div>
+
+    <!-- 関連記事セクション -->
+    {
+      relatedPosts.length > 0 && (
+        <div class="mt-16 border-t pt-10">
+          <h3 class="text-2xl font-bold mb-6">関連記事</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {relatedPosts.map((post) => (
+              <a
+                href={`/${getSlugFromId(post.id)}`}
+                class="p-4 border rounded-lg hover:shadow-md transition-shadow"
+              >
+                <h4 class="font-bold mb-2">{post.data.title}</h4>
+                <div class="flex flex-wrap gap-2 mb-2">
+                  {post.data.tags.map((tag) => (
+                    <span
+                      class={`text-xs px-2 py-0.5 rounded-full ${getTagColor(tag)} text-white`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <p class="text-sm text-gray-600">{post.data.description}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    <!-- 一覧に戻るボタン -->
+    <div class="mt-12 text-center">
+      <LinkButton href="/blog/page/1">記事一覧へ戻る</LinkButton>
     </div>
   </article>
 </Layout>
