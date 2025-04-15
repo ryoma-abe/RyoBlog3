@@ -13,7 +13,7 @@ const { currentPage, totalPages, baseUrl } = Astro.props;
     <div class="flex justify-center gap-4 mt-10">
       {Array.from({ length: totalPages }, (_, i) => (
         <a
-          href={`${baseUrl}${i === 0 ? "" : `/${i + 1}`}`}
+          href={`${baseUrl}/${i + 1}`}
           class={`px-4 py-2 rounded ${
             i + 1 === currentPage
               ? "bg-blue-400 text-white"

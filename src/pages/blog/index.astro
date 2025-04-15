@@ -1,0 +1,22 @@
+---
+import { getAllPosts, paginateItems } from "../../lib/utils/posts";
+import Layout from "../../layouts/Layout.astro";
+import BlogArea from "../../components/blog/BlogArea.astro";
+import Pagination from "../../components/blog/Pagination.astro";
+
+// ページサイズを定義
+const POSTS_PER_PAGE = 9;
+
+const allPosts = await getAllPosts();
+const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+const paginatedPosts = paginateItems(allPosts, 1, POSTS_PER_PAGE);
+const { items: posts } = paginatedPosts;
+---
+
+<Layout title="記事一覧">
+  <div class="mt-20">
+    <BlogArea customPosts={posts} />
+    <Pagination currentPage={1} totalPages={totalPages} baseUrl="/blog/page" />
+  </div>
+</Layout>
+

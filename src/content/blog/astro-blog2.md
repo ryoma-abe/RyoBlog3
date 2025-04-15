@@ -1,8 +1,8 @@
 ---
-title: "MDX記法のテスト記事"
-description: "MDXで使用できる代表的な記法をテストするための記事です。"
+title: "MDX記法のテスト記事2"
+description: "MDXで使用できる代表的な記法をテストするための記事です2。"
 date: "2025-04-15"
-slug: "mdx-test-article23"
+slug: "mdx-test-article2"
 tags: ["JavaScript", "MDX", "Astro"]
 ---
 
