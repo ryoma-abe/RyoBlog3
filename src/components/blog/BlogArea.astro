@@ -31,28 +31,27 @@ const sortedPosts = customPosts || allPosts.slice(0, 12);
                 <h2 class="text-xl font-bold px-4">{title}</h2>
               </div>
               <div class="px-6 py-6">
-                <div class="flex justify-between items-center">
-                  <div class="flex gap-2 flex-wrap">
-                    {Array.isArray(tags) && tags.length > 0 ? (
-                      tags.map((tag) => (
-                        <span
-                          class={`text-sm px-3 py-1 rounded-full ${getTagColor(tag)} text-white`}
-                        >
-                          {tag}
-                        </span>
-                      ))
-                    ) : (
-                      <span class="text-sm px-3 py-1 rounded-full bg-gray-500 text-white">
-                        その他
+                {/* タグ */}
+                <div class="flex gap-2 flex-wrap">
+                  {Array.isArray(tags) && tags.length > 0 ? (
+                    tags.map((tag) => (
+                      <span
+                        class={`text-sm px-3 py-1 rounded-full ${getTagColor(tag)} text-white`}
+                      >
+                        {tag}
                       </span>
-                    )}
-                  </div>
-                  <p class="text-primary text-sm">
-                    {formatDate(
-                      date instanceof Date ? date.toISOString() : String(date)
-                    )}
-                  </p>
+                    ))
+                  ) : (
+                    <span class="text-sm px-3 py-1 rounded-full bg-gray-500 text-white">
+                      その他
+                    </span>
+                  )}
                 </div>
+                <p class="text-primary text-sm mt-3">
+                  {formatDate(
+                    date instanceof Date ? date.toISOString() : String(date)
+                  )}
+                </p>
                 <p class="mt-5">{description}</p>
               </div>
             </a>
