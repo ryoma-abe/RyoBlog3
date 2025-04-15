@@ -1,37 +1,11 @@
 ---
-import { getCollection } from "astro:content";
+import { getAllPosts, getSlugFromId } from "../../lib/utils/posts";
 import { getTagColor } from "../../lib/utils/tags";
 import { formatDate } from "../../lib/utils/utils";
 
 // 記事データを取得
-const posts = await getCollection("blog");
-
-// デバッグ情報
-console.log(`記事の数: ${posts.length}`);
-if (posts.length > 0) {
-  console.log(`最初の記事: ${JSON.stringify(posts[0].data)}`);
-  console.log(`記事ID: ${posts[0].id}`);
-}
-
-// 日付でソート
-const sortedPosts = posts.sort((a, b) => {
-  // dateはDate型として処理する
-  const dateA =
-    a.data.date instanceof Date ? a.data.date : new Date(a.data.date);
-  const dateB =
-    b.data.date instanceof Date ? b.data.date : new Date(b.data.date);
-  return dateB.getTime() - dateA.getTime();
-});
-
-// デバッグ用：各記事のIDとデータを確認
-console.log(
-  "Posts Debug:",
-  posts.map((post) => ({
-    id: post.id,
-    title: post.data.title,
-    data: post.data,
-  }))
-);
+const allPosts = await getAllPosts();
+const sortedPosts = allPosts.slice(0, 6); // トップページには最新6件のみ表示
 ---
 
 <div class="grid grid-auto-300 gap-8">
@@ -39,12 +13,7 @@ console.log(
     sortedPosts.length > 0 ? (
       sortedPosts.map((post) => {
         const { title, tags, date, description } = post.data;
-
-        // ファイル名から取得（blog/first-post.md → first-post）
-        const slug = post.id
-          .replace("blog/", "")
-          .replace(".md", "")
-          .replace(".mdx", "");
+        const slug = getSlugFromId(post.id);
         const tag = Array.isArray(tags) && tags.length > 0 ? tags[0] : "その他";
 
         return (
@@ -91,4 +60,13 @@ console.log(
       </div>
     )
   }
+</div>
+
+<div class="flex justify-center mt-8">
+  <a
+    href="/blog/page/1"
+    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+  >
+    すべての記事を見る
+  </a>
 </div>
