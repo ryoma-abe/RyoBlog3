@@ -11,7 +11,6 @@ interface Props {
 
 const { customPosts } = Astro.props;
 const allPosts = await getAllPosts();
-// カスタムポストがある場合はそれを使用、ない場合はデフォルトのポスト
 const sortedPosts = customPosts || allPosts.slice(0, 12);
 ---
 
@@ -24,7 +23,7 @@ const sortedPosts = customPosts || allPosts.slice(0, 12);
         const tag = Array.isArray(tags) && tags.length > 0 ? tags[0] : "その他";
 
         return (
-          <div class="border-primary rounded-lg transition duration-300 hover:scale-102 hover:shadow-lg">
+          <div class="border-primary rounded-lg transition duration-300 hover:scale-102 hover:shadow-lg max-w-lg mx-auto w-full">
             <a href={`/${slug}`} class="block">
               <div
                 class={`h-48 flex items-center justify-center text-white text-center rounded-t-lg ${getTagColor(tag)}`}
@@ -62,7 +61,7 @@ const sortedPosts = customPosts || allPosts.slice(0, 12);
       })
     ) : (
       <div class="col-span-full text-center py-10">
-        <p class="text-xl text-gray-500">記事がありません</p>
+        <p>記事がありません</p>
       </div>
     )
   }
