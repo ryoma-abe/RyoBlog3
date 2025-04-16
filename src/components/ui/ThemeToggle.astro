@@ -100,6 +100,7 @@
   // テーマ切り替えの初期化処理
   const initThemeToggle = (): void => {
     const toggle: HTMLElement | null = document.getElementById("theme-toggle");
+    if (!toggle) return;
 
     // ローカルストレージからテーマを取得、なければシステム設定を使用
     const savedTheme: string | null = themeStorage.getTheme();
@@ -112,7 +113,7 @@
     }
 
     // テーマ切り替えの処理
-    toggle?.addEventListener("click", (): void => {
+    toggle.addEventListener("click", (): void => {
       const isDark: boolean = document.documentElement.classList.toggle("dark");
       themeStorage.setTheme(isDark ? "dark" : "light");
     });
@@ -125,6 +126,9 @@
       }
     });
   };
+
+  // スクリプトが読み込まれたらすぐに実行
+  initThemeToggle();
 
   // 通常のページロード時
   document.addEventListener("DOMContentLoaded", initThemeToggle);

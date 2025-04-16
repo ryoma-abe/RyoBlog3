@@ -1,24 +1,39 @@
-// 静的ページやリストページとして除外したいパス一覧
-const excludedPaths = ["/about", "/contact", "/blog", "/thanks", "/tags"];
+// 除外対象の固定ページ一覧（記事ページ判定に使う）
+const excludedPaths = [
+  "/about",
+  "/contact",
+  "/blog",
+  "/thanks",
+  "/tags",
+  "/sitemap",
+  "/404",
+  "/privacy-policy",
+];
 
 /**
- * パスの階層数を数える（例: /blog/page/2 → 3）
+ * パスの階層を数える（例: /blog/page/2 → 3）
  */
 export function getPathDepth(pathname: string): number {
   return pathname.slice(1).split("/").filter(Boolean).length;
 }
 
 /**
- * 記事詳細ページかどうかを判定
- * 1階層かつ除外パスに含まれないもの（例: /my-article）
+ * パスを正規化（末尾スラッシュを除去）
  */
-export function isArticlePage(pathname: string): boolean {
-  return getPathDepth(pathname) === 1 && !excludedPaths.includes(pathname);
+export function normalizePath(pathname: string): string {
+  return pathname.endsWith("/") ? pathname.slice(0, -1) || "/" : pathname;
 }
 
 /**
- * タグページかどうかを判定
- * 形式: /tags/タグ名（2階層、最初が tags）
+ * ブログ記事ページ（詳細ページ）かどうか
+ */
+export function isArticlePage(pathname: string): boolean {
+  const depth = getPathDepth(pathname);
+  return depth === 1 && !excludedPaths.includes(pathname);
+}
+
+/**
+ * タグページかどうか（/tags/javascript など）
  */
 export function isTagPage(pathname: string): boolean {
   const parts = pathname.slice(1).split("/").filter(Boolean);
@@ -26,10 +41,19 @@ export function isTagPage(pathname: string): boolean {
 }
 
 /**
- * ブログ一覧ページかどうかを判定
- * 対象: /blog または /blog/page/2 のような構造
+ * ブログ一覧ページかどうか（/blog や /blog/page/2）
  */
 export function isBlogIndexPage(pathname: string): boolean {
-  const normalized = pathname.replace(/\/+$/, "") || "/";
+  const normalized = normalizePath(pathname);
   return normalized === "/blog" || normalized.startsWith("/blog/page/");
+}
+
+/**
+ * ブログに関連するすべてのページかどうか
+ * 一覧ページ / タグページ / 記事ページ を含む
+ */
+export function isBlogRelatedPage(pathname: string): boolean {
+  return (
+    isBlogIndexPage(pathname) || isTagPage(pathname) || isArticlePage(pathname)
+  );
 }
