@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "../ui/ThemeToggle.astro";
+import { isBlogRelatedPage } from "../../lib/utils/path";
 
 const navItems = [
   { href: "/", label: "TOP" },
@@ -7,20 +8,9 @@ const navItems = [
   { href: "/about", label: "ABOUT" },
   { href: "/contact", label: "CONTACT" },
 ];
-const currentPath = Astro.url.pathname;
 
-// ブログ関連ページの判定
-const isBlogRelated =
-  currentPath.startsWith("/blog/") ||
-  currentPath.startsWith("/tags/") ||
-  currentPath === "/blog" ||
-  (currentPath.length > 1 &&
-    !currentPath.startsWith("/about") &&
-    !currentPath.startsWith("/contact") &&
-    !currentPath.startsWith("/sitemap") &&
-    !currentPath.startsWith("/404") &&
-    !currentPath.startsWith("/privacy-policy") &&
-    !currentPath.startsWith("/thanks"));
+const currentPath = Astro.url.pathname;
+const isBlogRelated = isBlogRelatedPage(currentPath);
 ---
 
 <header class="flex justify-between items-center p-4 border-b">
@@ -31,7 +21,6 @@ const isBlogRelated =
       <ul class="flex space-x-6">
         {
           navItems.map((item) => {
-            // TOPは完全一致、BLOGはブログ関連ページでもアクティブに
             const isActive =
               (item.label === "TOP" && currentPath === "/") ||
               (item.label === "BLOG" && isBlogRelated) ||
@@ -48,7 +37,6 @@ const isBlogRelated =
                 >
                   {item.label}
                 </a>
-
                 <span
                   class={`absolute left-0 -bottom-0.5 w-full h-0.5 transition-all duration-300 ${
                     isActive
