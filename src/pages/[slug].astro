@@ -4,6 +4,7 @@ import { formatDate } from "../lib/utils/utils";
 import { getTagColor } from "../lib/utils/tags";
 import { getAllPosts, getSlugFromId } from "../lib/utils/posts";
 import LinkButton from "../components/ui/LinkButton.astro";
+import Figure from "../components/blog/Figure.astro"; // ✅ すでにOK
 
 // ページのパスを生成
 export async function getStaticPaths() {
@@ -70,7 +71,8 @@ const articleData = {
     </div>
 
     <div class="markdown-content">
-      <Content />
+      <!-- ✅ ここで Figure を渡す -->
+      <Content components={{ Figure }} />
     </div>
 
     <!-- 関連記事セクション -->

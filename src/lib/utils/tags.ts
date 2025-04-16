@@ -51,18 +51,9 @@ export function getTagColor(tag: string): string {
     html: "bg-orange-600",
     css: "bg-blue-600",
     javascript: "bg-yellow-600",
-    typescript: "bg-blue-700",
-    react: "bg-sky-500",
-    vue: "bg-emerald-600",
-    "next.js": "bg-black",
-    "nuxt.js": "bg-green-700",
-    サンプル: "bg-indigo-600",
-    テスト: "bg-gray-600",
-    mdx: "bg-pink-600",
-    画像: "bg-red-500",
-    画像最適化: "bg-amber-600",
     ブログ: "bg-cyan-600",
     shopify: "bg-green-800",
+    column: "bg-red-800",
   };
 
   // タグを小文字に変換して大文字小文字を区別せずに色を取得

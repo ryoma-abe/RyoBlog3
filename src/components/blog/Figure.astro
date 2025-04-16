@@ -1,0 +1,20 @@
+---
+// components/Figure.astro
+export interface Props {
+  src: string;
+  alt?: string;
+  caption?: string;
+  className?: string;
+}
+
+const { src, alt = "", caption, className = "" } = Astro.props;
+---
+
+<figure class={`my-6 text-center ${className}`}>
+  <img src={src} alt={alt} class="mx-auto rounded shadow" loading="lazy" />
+  {
+    caption && (
+      <figcaption class="mt-2 text-sm text-gray-500">{caption}</figcaption>
+    )
+  }
+</figure>
