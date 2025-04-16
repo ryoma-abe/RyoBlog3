@@ -13,12 +13,8 @@ function formatDate(date: Date): string {
 
 // 更新日時を取得
 const now = new Date();
-
-// メインページの更新日時
 const indexModified = formatDate(now);
-
-// 現在の日時を取得
-const currentDate = new Date().toISOString();
+const currentDate = now.toISOString();
 ---
 
 <!--?xml version="1.0" encoding="UTF-8"?-->
@@ -49,19 +45,16 @@ const currentDate = new Date().toISOString();
   <!-- 記事ページ -->
   {
     articles.map((article) => {
-      // 記事のスラッグ
-      const slug = article.data.slug;
-      // 記事の日付
-      const date =
+      const slug = article.slug; // ✅ 修正ポイント
+      const date = formatDate(
         article.data.date instanceof Date
-          ? formatDate(article.data.date)
-          : formatDate(new Date(article.data.date));
+          ? article.data.date
+          : new Date(article.data.date)
+      );
 
       return (
         <url>
-          <loc>
-            {url}/{slug}
-          </loc>
+          <loc>{`${url}/${slug}`}</loc>
           <lastmod>{date}</lastmod>
           <changefreq>weekly</changefreq>
           <priority>0.7</priority>
