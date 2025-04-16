@@ -1,51 +1,32 @@
 ---
 import Header from "../components/common/Header.astro";
 import Footer from "../components/common/Footer.astro";
-import { getMeta } from "../lib/utils/meta";
-import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
+import { getPageMeta, normalizePath } from "../lib/utils/meta";
+import { isArticlePage, isTagPage } from "../lib/utils/path";
+import "../styles/global.css";
 
-// 記事詳細ページかどうか（例: /test-article のような1階層のみ）
-const isArticlePage =
-  Astro.url.pathname.slice(1).split("/").filter(Boolean).length === 1 &&
-  !["/about", "/contact", "/blog", "/thanks", "/tags"].includes(
-    Astro.url.pathname
-  );
-
-// タグページかどうか（例: /tags/javascript のような形式）
-const isTagPage =
-  Astro.url.pathname.startsWith("/tags/") &&
-  Astro.url.pathname.slice(1).split("/").filter(Boolean).length === 2;
-
-// 記事データがpropsとして渡された場合は、それを使用する
+// 記事データ（propsから受け取る場合）
 const { articleData } = Astro.props;
 
-// 正規化されたパス（末尾のスラッシュを考慮）
-const normalizedPath = Astro.url.pathname.endsWith("/")
-  ? Astro.url.pathname.slice(0, -1) || "/"
-  : Astro.url.pathname;
+// 正規化されたパス（末尾スラッシュを除去）
+const pathname = normalizePath(Astro.url.pathname);
 
-// ブログ一覧ページかどうか
-const isBlogIndexPage =
-  normalizedPath === "/blog" || normalizedPath.startsWith("/blog/page/");
-
-// 記事データがある場合は記事のメタ情報、ない場合はpathからメタ情報を取得
+// メタ情報の取得（記事データがある場合は優先）
 const meta = articleData
   ? {
       title: `${articleData.title} | RyoBlog`,
       description: articleData.description || "",
       keywords: articleData.tags || [],
     }
-  : getMeta(isBlogIndexPage ? "/blog" : normalizedPath);
+  : getPageMeta(pathname);
 
-// ページのh1タイトル用（表示用のみに使用）
+// h1見出しに使うタイトル（" | RyoBlog" 除去）
 const pageHeadingTitle = Astro.props.title || meta.title.split(" | ")[0];
 
-// SEO用のメタタイトル（完全なタイトル）
+// メタタイトル（タグページはprops.titleを優先）
 const metaTitle =
-  isTagPage && Astro.props.title
-    ? Astro.props.title // タグページの場合は、明示的に設定されたタイトルを使用
-    : meta.title; // それ以外はmeta.jsonのタイトルを使用
+  isTagPage(pathname) && Astro.props.title ? Astro.props.title : meta.title;
 
 const description = Astro.props.description ?? meta.description;
 const keywords = Astro.props.keywords ?? meta.keywords;
@@ -63,7 +44,10 @@ const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
     <meta name="keywords" content={keywordsString} />
     <meta property="og:title" content={metaTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content={isArticlePage ? "article" : "website"} />
+    <meta
+      property="og:type"
+      content={isArticlePage(pathname) ? "article" : "website"}
+    />
     <meta
       property="og:url"
       content={`https://web-ryoma.conohawing.com${Astro.url.pathname}`}
@@ -78,10 +62,9 @@ const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
       href={`https://web-ryoma.conohawing.com${Astro.url.pathname}`}
     />
     <link rel="icon" href="/favicon.png" type="image/png" />
-    <!-- 残りはそのまま -->
 
+    <!-- ダークモード設定 -->
     <script is:inline>
-      // ダークモードの初期設定
       const initTheme = () => {
         const theme = (() => {
           if (
@@ -102,49 +85,33 @@ const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
           document.documentElement.classList.remove("dark");
         }
       };
-
-      // 初期ロード時
       initTheme();
-
-      // Astroのページ遷移後
       document.addEventListener("astro:page-load", initTheme);
     </script>
 
     <!-- コードブロックのコピー機能 -->
     <script is:inline>
-      // コードブロックのコピー機能の初期化
       const initCodeCopyButtons = () => {
-        // コードブロックの各pre要素にコピーボタンを追加
         document.querySelectorAll("pre").forEach((pre) => {
-          // すでにラッパーで囲まれている場合はスキップ
-          if (pre.parentNode.classList.contains("code-block-wrapper")) {
-            return;
-          }
+          if (pre.parentNode.classList.contains("code-block-wrapper")) return;
 
-          // ラッパー要素を作成してpreを囲む
           const wrapper = document.createElement("div");
           wrapper.className = "code-block-wrapper relative";
           pre.parentNode.insertBefore(wrapper, pre);
           wrapper.appendChild(pre);
 
-          // コピーボタンを作成
           const copyButton = document.createElement("button");
           copyButton.className =
             "copy-button absolute top-2 right-2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-70 hover:opacity-100 transition-opacity";
           copyButton.textContent = "コピー";
           wrapper.appendChild(copyButton);
 
-          // コピーボタンのクリックイベント
           copyButton.addEventListener("click", () => {
-            // pre内のcode要素からテキストを取得
             const code = pre.querySelector("code");
             const text = code ? code.innerText : pre.innerText;
-
-            // クリップボードにコピー
             navigator.clipboard
               .writeText(text)
               .then(() => {
-                // コピー成功時の表示
                 copyButton.textContent = "コピー完了！";
                 setTimeout(() => {
                   copyButton.textContent = "コピー";
@@ -161,10 +128,7 @@ const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
         });
       };
 
-      // 初期ロード時
       document.addEventListener("DOMContentLoaded", initCodeCopyButtons);
-
-      // Astroのページ遷移後
       document.addEventListener("astro:page-load", initCodeCopyButtons);
     </script>
   </head>
@@ -173,7 +137,7 @@ const keywordsString = Array.isArray(keywords) ? keywords.join(", ") : keywords;
     <main>
       <div class="container mx-auto py-20 px-5">
         {
-          isArticlePage === false && !isTagPage && (
+          !isArticlePage(pathname) && !isTagPage(pathname) && (
             <h1 class="text-4xl font-bold text-center">{pageHeadingTitle}</h1>
           )
         }
