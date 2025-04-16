@@ -1,5 +1,7 @@
 ---
 // components/Figure.astro
+import { Image } from "astro:assets";
+
 export interface Props {
   src: string;
   alt?: string;
@@ -11,7 +13,15 @@ const { src, alt = "", caption, className = "" } = Astro.props;
 ---
 
 <figure class={`my-6 text-center ${className}`}>
-  <img src={src} alt={alt} class="mx-auto rounded shadow" loading="lazy" />
+  <Image
+    src={src}
+    alt={alt}
+    width={800}
+    height={600}
+    format="webp"
+    quality="high"
+    class="mx-auto rounded shadow"
+  />
   {
     caption && (
       <figcaption class="mt-2 text-sm text-gray-500">{caption}</figcaption>
