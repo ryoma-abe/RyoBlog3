@@ -1,0 +1,417 @@
+---
+title: "【2025年最新】Astroで初心者でも簡単にポートフォリオサイトを作成する方法"
+date: "2025-03-29"
+tags: ["Astro"]
+description: "コーディングが苦手な初心者でも簡単に作れるAstroフレームワークを使ったポートフォリオサイト作成方法を解説。環境構築から公開までの手順を紹介。"
+draft: false
+---
+
+import Figure from "../../../components/blog/Figure.astro";
+import { Image } from "astro:assets";
+import astroDocument from "../../../assets/images/CleanShot-2025-03-22-at-14.16.23-1024x499.jpg";
+import resourcesThemes from "../../../assets/images/CleanShot-2025-03-28-at-13.47.05-1024x584.jpg";
+import discoverThemes from "../../../assets/images/CleanShot-2025-04-01-at-09.21.28-1024x500.jpg";
+import viewResults from "../../../assets/images/CleanShot-2025-03-28-at-13.52.35-1024x679.jpg";
+import liveDemo from "../../../assets/images/CleanShot-2025-03-28-at-13.58.53-1024x749.jpg";
+import techEnvironment from "../../../assets/images/CleanShot-2025-03-28-at-14.00.54-1024x729.jpg";
+import codeButton from "../../../assets/images/CleanShot-2025-03-28-at-14.11.21-1024x581.png";
+import desktopProject from "../../../assets/images/CleanShot-2025-03-28-at-14.19.19@2x.jpg";
+import templateDisplay from "../../../assets/images/CleanShot-2025-03-28-at-14.22.16-1024x608.jpg";
+import astroLearning from "../../../assets/images/CleanShot-2025-03-28-at-15.22.51.jpg";
+import netlifyOfficial from "../../../assets/images/CleanShot-2025-04-01-at-09.34.43-1024x630.png";
+import continueToDeploy from "../../../assets/images/CleanShot-2025-04-01-at-10.23.40-1024x586.png";
+import selectGitHub from "../../../assets/images/CleanShot-2025-04-01-at-10.27.42.png";
+import selectRepo from "../../../assets/images/CleanShot-2025-04-01-at-10.30.23.png";
+import bottomButton from "../../../assets/images/CleanShot-2025-04-01-at-10.32.07.png";
+import openProduction from "../../../assets/images/CleanShot-2025-04-01-at-11.07.14@2x-1024x591.png";
+
+## はじめに
+
+「コーディングが苦手でも、かっこいいサイトが作れないかな…」  
+「foriio や Notion でポートフォリオを作っているけど、もっと差別化したい」  
+「せっかくのポートフォリオ、SEO 対策もしっかりしたいけど何から手をつければいいか分からない…」
+
+こんな悩みを持っている方は多いのではないでしょうか。
+
+今回は、そんな悩みを解決できる Astro というフレームワークでポートフォリオを簡単に作成する方法をご紹介します。
+
+Astro は静的サイトジェネレーターとして高速で軽量、そして SEO 対策も万全。特にコンテンツ重視のポートフォリオサイト作成には最高のツールです。
+
+この記事では、コーディング初心者の方でも簡単に Astro のテンプレートを活用して、見栄えの良いポートフォリオサイトを作る方法を解説します。
+
+環境構築から公開までの手順、テンプレート選びのコツ、そして SEO 対策まで全てカバーしているので、ぜひ参考にポートフォリオサイトを作って見てください。
+
+## Astro とは？
+
+<Figure
+  src={astroDocument}
+  alt="Astro公式ドキュメント"
+  caption="Astro公式ドキュメント"
+/>
+
+Astro は、高速で軽量なウェブサイトを作れる静的サイトジェネレーターです。
+
+HTML の基本知識があれば使えて、特にポートフォリオサイトの作成に最適です。
+
+Astro の詳しい特徴や基本的な使用方法については、以下の記事で詳しく解説していますので、ぜひチェックしてみてください。
+
+## Astro でポートフォリオサイトを作る準備
+
+Astro を使うには、Node.js というソフトウェアが必要です。
+
+手順はとても簡単で以下の 3 ステップで進めてください。
+
+1. [Node.js の公式サイト](https://nodejs.org/)にアクセス
+
+2. 「LTS」と書かれたボタンをクリック（安定版がおすすめです）
+
+3. ダウンロードしたファイルを実行してインストール
+
+インストールが完了したら、コマンドプロンプト（Windows の場合）やターミナル（Mac の場合）を開いて、以下のコマンドを入力してみましょう：
+
+```
+node -v
+```
+
+バージョン番号が表示されれば、インストール成功です
+
+## テンプレートのインストール
+
+### テンプレート選定
+
+Astro には様々なテンプレートがあり、それを使用して作成していきます。
+
+[Astro 公式サイト](https://astro.build/)にアクセスして、「Resources」→「Themes」を選択してください。
+
+<Figure
+  src={resourcesThemes}
+  alt="「Resources」→「Themes」を選択する参考画像"
+  caption="「Resources」→「Themes」を選択"
+/>
+
+次に少し下にスクロールして、「Discover more themes ボタン」を押してください。
+
+<Figure
+  src={discoverThemes}
+  alt="「Discover more themesボタン」を押す"
+  caption="「Discover more themesボタン」を押す"
+/>
+
+すると様々なテンプレートが準備されています。
+
+今回は無料で、ポートフォリオに向いているテーマを使用します。
+
+右のサイドバーから「Categories」を「Portfolio」にします。
+
+次に「Pricing」を「Free」しして「View results ボタン」を押して絞り込みをしてください。
+
+<Figure
+  src={viewResults}
+  alt="「View resultsボタン」を押して絞り込みをする"
+  caption="「View resultsボタン」を押して絞り込み"
+/>
+
+ここから好きなテンプレートを選択してください。
+
+テーマを選択し、「Live demo ボタン」を押すと、テーマのデモを見ることが出来ます。
+
+<Figure
+  src={liveDemo}
+  alt="「Live demoボタン」を押すと、テーマのデモを見ることができる"
+  caption="「Live demoボタン」を押すと、テーマのデモを見ることができる"
+/>
+
+「[Get started](https://github.com/itsteddydev/hub-itsteddydev)ボタン」を押すとテーマの Github を確認することができるので、使用されている技術や必要環境など確認してみてください。
+
+テーマによっては GSAP の有料プランが必要だったりしますので、翻訳等を使って確認してみてください。
+
+<Figure
+  src={techEnvironment}
+  alt="使用されている技術や必要環境など確認する参考画像"
+  caption="使用されている技術や必要環境など確認する"
+/>
+
+### 自分の環境にインストール
+
+テンプレートを選んだら、GitHub からクローンして自分の環境にインストールしていきましょう。
+
+選んだテンプレートの GitHub ページにアクセスし、「Code」ボタンをクリックし、リポジトリの URL をコピーします。
+
+<Figure
+  src={codeButton}
+  alt="「Code」ボタンをクリックし、リポジトリのURLをコピー"
+  caption="「Code」ボタンをクリックし、リポジトリのURLをコピー"
+/>
+
+ターミナル（コマンドプロンプト）やエディタのターミナルを開いてください。
+
+今回はわかりやすいようにデスクトップに作成していきたいので、以下のコマンドを実行しデスクトップに移動してください。
+
+```
+cd Desktop
+```
+
+次に以下のコマンドでリポジトリをクローンしてください。
+
+```
+git clone [コピーしたURL] my-portfolio
+```
+
+\[コピーした URL\]の部分は、実際にコピーした URL に置き換えてください。
+
+するとデスクトップにプロジェクトが作成されますので、お使いのエディタで開いてください。
+
+<Figure
+  src={desktopProject}
+  alt="デスクトップにプロジェクトが作成される"
+  caption="デスクトップにプロジェクトが作成される"
+/>
+
+次に必要な依存関係をインストールします。
+
+エディタでターミナルを開き、以下のコマンドを実行してください。
+
+```
+npm install
+```
+
+インストールが終わったら、開発サーバーを起動して、テンプレートが正常に動作するか確認します。
+
+```
+npm run dev
+```
+
+ターミナルに表示された URL にアクセスすると、テンプレートが表示されます。
+
+<Figure
+  src={templateDisplay}
+  alt="ターミナルに表示されたURLにアクセスすると、テンプレートが表示される"
+  caption="ターミナルに表示されたURLにアクセスすると、テンプレートが表示される"
+/>
+
+これで基本的なテンプレートのインストールは完了です。
+
+## カスタマイズの方法
+
+テンプレートをインストールしたら、次に自分のポートフォリオサイトにカスタマイズしていきましょう。
+
+### 基本的なディレクトリ構成
+
+Astro プロジェクトの標準的なディレクトリ構成は以下のようになっています：
+
+```
+my-portfolio/
+├── public/          # 静的ファイル（画像、フォントなど）
+├── src/             # ソースコード
+│   ├── components/  # 再利用可能なコンポーネント
+│   ├── layouts/     # ページレイアウト
+│   ├── pages/       # 各ページのファイル
+│   ├── content/     # ブログ記事やプロジェクト情報などのコンテンツ
+│   └── styles/      # CSSファイル
+├── astro.config.mjs # Astroの設定ファイル
+└── package.json     # プロジェクトの依存関係
+```
+
+### 主なカスタマイズ対象のファイル・フォルダ
+
+#### `public/` フォルダ
+
+ここには画像やフォント、favicon などの静的ファイルを配置します。
+
+- **画像の追加**: 自分のプロフィール写真やプロジェクトのスクリーンショットをここに配置します
+
+- **favicon**: サイトのファビコンを `public/favicon.ico` または `public/favicon.svg` として配置します
+
+#### `src/pages/` フォルダ
+
+Web サイトの各ページを定義するファイルが入っています。
+
+- **index.astro**: トップページの内容
+
+- **about.astro**: 自己紹介ページ
+
+- **projects.astro**: プロジェクト一覧ページ
+
+- **contact.astro**: お問い合わせページ
+
+これらのファイルを編集して、自分の情報や希望するレイアウトに変更します。
+
+#### `src/components/` フォルダ
+
+再利用可能な UI パーツが入っています。
+
+- **Header.astro**: サイトのヘッダー
+
+- **Footer.astro**: サイトのフッター
+
+- **ProjectCard.astro**: プロジェクト一覧でのカードコンポーネント
+
+- **ContactForm.astro**: お問い合わせフォーム
+
+これらのコンポーネントを編集して、デザインや機能をカスタマイズします。
+
+#### `src/content/` または `src/data/` フォルダ
+
+多くのテンプレートでは、コンテンツやデータを管理するためのフォルダがあります。
+
+テンプレートによって名前や構造が異なる場合があります。
+
+- **projects/**: プロジェクト情報を含む Markdown ファイル
+
+- **blog/**: ブログ記事を含む Markdown ファイル
+
+- **data.js**または**site.js**: サイト全体の設定（タイトル、説明、SNS リンクなど）
+
+#### `src/styles/` フォルダ
+
+CSS ファイルが入っています。グローバルスタイルや特定のコンポーネント用のスタイルを編集できます。
+
+これらのファイルを編集し、オリジナルのポートフォリオを作成してみてください。
+
+以下の記事では Astro の具体的な使用方法を解説していますので、あわせて参考にしてみてください。
+
+Astro の学習は以下の教材がおすすめです！
+
+短時間で濃密な内容を学べるうえ、解説が丁寧で、理解しやすいと高評価のベストセラー講座です。
+
+<Figure
+  src={astroLearning}
+  alt="ちゃんと学ぶ、Astro"
+  caption="ちゃんと学ぶ、Astro"
+/>
+
+### カスタマイズの具体例
+
+#### 基本情報の変更
+
+多くのテンプレートでは、サイト全体の情報を一つのファイルにまとめています。
+
+例えば `src/data/site.js` や `src/content/config.js` などの名前です。
+
+```
+// src/data/site.js の例
+export const siteConfig = {
+  name: "あなたの名前",
+  title: "Web開発者 & デザイナー",
+  description: "ポートフォリオサイトの説明文",
+  url: "https://yourwebsite.com",
+  ogImage: "/images/og-image.jpg",
+  links: {
+    twitter: "https://twitter.com/yourusername",
+    github: "https://github.com/yourusername",
+    linkedin: "https://linkedin.com/in/yourusername"
+  }
+};
+```
+
+このファイルを探して編集することで、サイト全体の基本情報を変更できます。
+
+少し JavaScript の知識が必要になるので、JavaScript の学習には以下の記事も参考にしてみてください。
+
+#### デザインのカスタマイズ
+
+多くのテンプレートは Tailwind CSS を使用していますので、関係ファイルを修正することでカラーやフォントを変更することができます。
+
+Tailwind CSS については以下の記事で解説しています。
+
+## デプロイ方法
+
+ポートフォリオサイトが完成したら、次はインターネット上に公開（デプロイ）してみましょう。
+
+Astro で作成したサイトは、様々なホスティングサービスでデプロイすることができます。ここでは初心者の方にも使いやすい Netlify でのデプロイをご紹介します。
+
+### Netlify でのデプロイ
+
+<Figure
+  src={netlifyOfficial}
+  alt="Netlify公式サイトのトップページ画像"
+  caption="Netlify公式"
+/>
+
+Netlify は無料で利用でき、GitHub と連携することで簡単にデプロイできる人気のサービスです。
+
+- ビルドの実行
+
+デプロイ前に、ローカル環境でプロジェクトをビルドして問題がないか確認しましょう
+
+```
+npm run build
+```
+
+ビルドが成功すると、dist ディレクトリにサイトのファイルが生成されます。
+
+ローカルで確認したい場合は以下のコマンドを実行して、ビルド結果をプレビューできます
+
+```
+npm run preview
+```
+
+2. **GitHub にプロジェクトをアップロード**
+
+- GitHub アカウントをお持ちでない場合は、まず[GitHub の公式サイト](https://github.com/)でアカウントを作成してください
+
+- 新しいリポジトリを作成し、ポートフォリオのコードをアップロードします
+
+- 以下のコマンドを順に実行してください：
+
+```
+# 既存のリモート設定を自分のリポジトリに変更
+git remote set-url origin [あなたのGitHubリポジトリURL]
+
+# コードをコミットして自分のリポジトリにプッシュ
+git add .
+git commit -m "ポートフォリオサイトのカスタマイズ"
+git push -u origin main
+```
+
+3. **Netlify でサイトを設定**
+
+[Netlify の公式サイト](https://www.netlify.com/)にアクセスし、GitHub アカウントでログインしてください。
+
+各種必要項目の入力画面になるので、入力し「Continue to deploy ボタン」を押してください。
+
+<Figure
+  src={continueToDeploy}
+  alt="「Continue to deployボタン」を押す参考画像"
+  caption="「Continue to deployボタン」を押す"
+/>
+
+Deploy your first project 画面で GitHub を選択してください。
+
+<Figure
+  src={selectGitHub}
+  alt="GitHubを選択する参考画像"
+  caption="GitHubを選択"
+/>
+
+GitHub の認証ができたら、先ほど作成したリポジトリを選んでください。
+
+<Figure
+  src={selectRepo}
+  alt="リポジトリを選択する参考画像"
+  caption="リポジトリを選択"
+/>
+
+次に下部のボタンを押してください。
+
+<Figure
+  src={bottomButton}
+  alt="下部のボタンを押す参考画像"
+  caption="下部のボタンを押す"
+/>
+
+すべての項目が「Complete」になればデプロイ完了です。
+
+画面上部の「Open production deploy ボタン」からサイトを確認することができます。
+
+<Figure
+  src={openProduction}
+  alt="「Open production deployボタン」からサイトを確認することができる参考画像"
+  caption="「Open production deployボタン」からサイトを確認することができる"
+/>
+
+## まとめ
+
+この記事でご紹介したように、Astro はコンテンツ重視のポートフォリオサイト作成に最適なフレームワークです。高速で軽量な特性に加え、SEO 対策もバッチリなので、作品やスキルを効果的にアピールできますので、ぜひ参考にしてみてください。
+
+何か分からないことがあれば、コメント欄やお問い合わせフォームからご質問ください。皆さんのポートフォリオ作成を応援しています。
